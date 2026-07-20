@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Challenges of Machine Learning - Presentation Platform</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter & Fira Code Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            500: '#ea580c',  /* Aditya Orange primary accent */
+                            600: '#1e3a8a',  /* Aditya University Deep Blue */
+                            700: '#1d4ed8',
+                            900: '#172554',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(30, 58, 138, 0.2);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(234, 88, 12, 0.4);
+        }
+
+        .slide-enter {
+            opacity: 0;
+            transform: scale(0.98) translateY(10px);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide-active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.96);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: scale(1.08);
+                opacity: 0.9;
+            }
+
+            100% {
+                transform: scale(0.96);
+                opacity: 0.6;
+            }
+        }
+
+        .pulse-element {
+            animation: pulse-ring 3s infinite ease-in-out;
+        }
+
+        /* Fullscreen Hidden Elements (Disappears automatically when in fullscreen mode) */
+        :fullscreen #outline-sidebar,
+        :-webkit-full-screen #outline-sidebar,
+        :fullscreen #notes-sidebar,
+        :-webkit-full-screen #notes-sidebar,
+        :fullscreen #header-controls,
+        :-webkit-full-screen #header-controls,
+        :fullscreen #footer-controls,
+        :-webkit-full-screen #footer-controls,
+        .pseudo-fullscreen #outline-sidebar,
+        .pseudo-fullscreen #notes-sidebar,
+        .pseudo-fullscreen #header-controls,
+        .pseudo-fullscreen #footer-controls {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+            border: none !important;
+            margin: 0 !important;
+        }
+
+        :fullscreen #slide-viewport,
+        :-webkit-full-screen #slide-viewport {
+            max-width: 100vw !important;
+            max-height: calc(100vh - 200px) !important;
+            /* Reserve height space for Header & Footers */
+            width: 100% !important;
+            height: 100% !important;
+            border: none !important;
+            border-radius: 0px !important;
+            background-color: #ffffff !important;
+            /* Clean light background for full-screen slide projection */
+        }
+
+        /* High-fidelity Fallback when Native Fullscreen is blocked by IFrame Permissions Policy */
+        .pseudo-fullscreen #slide-viewport {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: 100vw !important;
+            max-height: 100vh !important;
+            z-index: 9999 !important;
+            border: none !important;
+            border-radius: 0px !important;
+            background-color: #ffffff !important;
+        }
+    </style>
+</head>
+
+<body class="h-full bg-slate-50 text-slate-800 font-sans overflow-hidden">
+
+    <div class="h-full flex flex-col">
+        <!-- Control Header -->
+        <header
+            class="bg-white border-b border-slate-200 px-8 py-4 flex flex-wrap justify-between items-center gap-4 z-10 shrink-0 shadow-sm">
+            <div class="flex items-center gap-4">
+                <img src="https://www.facultyplus.com/wp-content/uploads/2025/07/Aditya-university-logo.webp"
+                    alt="Aditya University Logo"
+                    onerror="this.src='https://placehold.co/150x50/1e3a8a/ffffff?text=Aditya+University'"
+                    class="h-12 md:h-14 w-auto object-contain p-1 rounded-xl border border-slate-100 shadow-sm bg-white">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-black tracking-tight text-brand-600 flex items-center gap-3">
+                        Main Challenges of Machine Learning
+                        <span
+                            class="text-xs font-bold px-2.5 py-1 rounded bg-orange-100 text-brand-500 border border-orange-200 tracking-wider">CO1
+                            Mapping</span>
+                    </h1>
+                    <p class="text-sm text-slate-500 font-medium font-mono">Unit-I Core Engineering Challenges & Model
+                        Failures</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4 flex-wrap">
+                <!-- Modes and Shortcut Controls (Disappears in Fullscreen) -->
+                <div id="header-controls" class="flex items-center gap-4 flex-wrap">
+                    <!-- Modes Toggle -->
+                    <div
+                        class="bg-slate-100 rounded-xl p-1 border border-slate-200 flex items-center gap-1 shadow-inner">
+                        <button id="btn-student-mode" onclick="toggleMode('student')"
+                            class="px-4 py-2 rounded-lg text-sm font-semibold transition duration-200 flex items-center gap-2 text-brand-500 bg-white border border-slate-200 shadow-sm">
+                            <i class="fa-solid fa-graduation-cap text-orange-500"></i> Student Guide
+                        </button>
+                        <button id="btn-teacher-mode" onclick="toggleMode('teacher')"
+                            class="px-4 py-2 rounded-lg text-sm font-semibold transition duration-200 flex items-center gap-2 text-slate-600 hover:text-slate-900">
+                            <i class="fa-solid fa-chalkboard-user"></i> Lecture Notes
+                        </button>
+                    </div>
+
+                    <!-- Shortcuts Help -->
+                    <button onclick="toggleHelpModal()"
+                        class="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition duration-150 flex items-center gap-2">
+                        <i class="fa-regular fa-keyboard text-brand-500"></i> Hotkeys
+                    </button>
+                </div>
+
+                <!-- Fullscreen Button -->
+                <button onclick="toggleFullscreen()"
+                    class="p-2.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-slate-700 transition duration-150"
+                    title="Toggle Fullscreen (F)">
+                    <i id="fullscreen-icon" class="fa-solid fa-expand"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 flex overflow-hidden relative">
+
+            <!-- Left Outline Sidebar -->
+            <aside id="outline-sidebar"
+                class="w-80 bg-slate-100 border-r border-slate-200 flex flex-col transition-all duration-300 shrink-0">
+                <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-white">
+                    <span class="text-xs font-bold uppercase tracking-widest text-slate-500">Lecture Outline</span>
+                    <span
+                        class="text-xs bg-slate-200 px-2.5 py-1 rounded border border-slate-300 font-mono font-bold text-slate-700"
+                        id="slide-ratio-counter">Slide 1 / 14</span>
+                </div>
+                <div class="flex-1 overflow-y-auto p-3 space-y-1" id="outline-list">
+                    <!-- Dynamic rendering of slides -->
+                </div>
+            </aside>
+
+            <!-- Center Stage Slide Viewport -->
+            <div class="flex-1 flex flex-col bg-slate-50 overflow-hidden relative">
+                <!-- Outer slide frame mimicking projection screen -->
+                <div class="flex-1 flex items-center justify-center p-6 lg:p-10 overflow-hidden">
+                    <div id="slide-viewport"
+                        class="group/viewport w-full max-w-7xl bg-white border border-slate-200 rounded-2xl shadow-xl flex flex-col min-h-[640px] max-h-[85vh] transition-all relative overflow-hidden">
+
+                        <!-- Floating Zoom & Pan Controls -->
+                        <div id="zoom-controls-panel"
+                            class="absolute top-4 left-4 z-40 bg-white/95 border border-slate-200 p-1.5 rounded-xl flex items-center gap-2 shadow-md opacity-0 group-hover/viewport:opacity-100 group-hover/viewport:pointer-events-auto focus-within:opacity-100 focus-within:pointer-events-auto transition-all duration-300">
+                            <span
+                                class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest pl-1">Zoom:</span>
+                            <button onclick="adjustZoom(0.1)"
+                                class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 flex items-center justify-center text-xs font-bold transition"
+                                title="Zoom In">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <span id="zoom-factor-indicator"
+                                class="text-xs font-mono font-bold text-brand-500 min-w-[36px] text-center">100%</span>
+                            <button onclick="adjustZoom(-0.1)"
+                                class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 flex items-center justify-center text-xs font-bold transition"
+                                title="Zoom Out">
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+                            <button onclick="resetZoom()"
+                                class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center text-[10px] transition"
+                                title="Reset Zoom">
+                                <i class="fa-solid fa-rotate-left"></i>
+                            </button>
+                            <div class="w-px h-5 bg-slate-200"></div>
+                            <button id="btn-pan-mode" onclick="togglePanMode()"
+                                class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-center text-[11px] transition"
+                                title="Toggle Pan Grab Tool (Or hold Shift)">
+                                <i class="fa-solid fa-hand"></i>
+                            </button>
+                        </div>
+
+                        <!-- ZOOMABLE INNER CONTAINER FRAME -->
+                        <div class="flex-1 relative overflow-hidden bg-white" id="viewport-content-frame">
+                            <div id="zoom-content-wrapper"
+                                class="w-full h-full absolute inset-0 origin-center transition-transform duration-100 ease-out flex flex-col justify-center">
+
+                                <!-- Whiteboard Drawing Overlay Canvas -->
+                                <canvas id="whiteboard-canvas"
+                                    class="absolute inset-0 z-20 pointer-events-none bg-transparent"></canvas>
+
+                                <!-- Whitepaper overlay for drawing -->
+                                <div id="whitepaper-overlay"
+                                    class="absolute inset-0 bg-white z-10 hidden flex flex-col items-center justify-center pointer-events-none select-none">
+                                    <div class="text-center space-y-4 max-w-md px-6">
+                                        <div
+                                            class="w-20 h-20 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center mx-auto shadow-inner text-brand-500">
+                                            <i class="fa-solid fa-pen-ruler text-4xl animate-pulse"></i>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <h3
+                                                class="text-xl font-black text-slate-900 uppercase tracking-widest font-mono">
+                                                Whitepaper Workspace</h3>
+                                            <p class="text-sm text-slate-500 leading-relaxed">This is a blank drawing
+                                                board. Select your preferred pen color below and sketch freely over this
+                                                projection window.</p>
+                                        </div>
+                                        <div
+                                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600 font-mono">
+                                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                            Interactive Drawing Mode Enabled
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Laser Pointer element -->
+                                <div id="laser-pointer"
+                                    class="absolute w-8 h-8 rounded-full bg-rose-600/95 shadow-[0_0_20px_6px_#ef4444] pointer-events-none z-30 hidden -translate-x-1/2 -translate-y-1/2 mix-blend-multiply">
+                                </div>
+
+                                <!-- DYNAMIC SLIDE CONTENT VIEW -->
+                                <div class="flex-1 p-8 md:p-12 overflow-y-auto flex flex-col justify-center"
+                                    id="slide-stage">
+                                    <!-- Injected slide elements -->
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Floating Presentation Tools Overlay Palette -->
+                        <div id="presentation-tools-palette"
+                            class="absolute bottom-4 right-4 bg-white/95 border border-slate-200 px-3.5 py-2 rounded-xl flex items-center gap-3 z-40 shadow-md hidden">
+                            <span
+                                class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">Draw:</span>
+                            <button onclick="setWhiteboardColor('#ef4444')"
+                                class="w-5 h-5 rounded-full bg-rose-500 border-2 border-white/80 hover:scale-110 transition"
+                                title="Red"></button>
+                            <button onclick="setWhiteboardColor('#10b981')"
+                                class="w-5 h-5 rounded-full bg-emerald-500 border-2 border-white/80 hover:scale-110 transition"
+                                title="Green"></button>
+                            <button onclick="setWhiteboardColor('#1e3a8a')"
+                                class="w-5 h-5 rounded-full bg-blue-900 border-2 border-white/80 hover:scale-110 transition"
+                                title="Blue"></button>
+                            <button onclick="setWhiteboardColor('#1e293b')"
+                                class="w-5 h-5 rounded-full bg-slate-800 border-2 border-white/80 hover:scale-110 transition"
+                                title="Slate (Dark)"></button>
+                            <div class="w-px h-5 bg-slate-200"></div>
+                            <button onclick="clearWhiteboard()"
+                                class="p-1.5 bg-slate-50 hover:bg-slate-100 text-rose-600 hover:text-rose-500 rounded-lg text-xs font-bold font-mono border border-slate-200 flex items-center gap-1">
+                                <i class="fa-solid fa-eraser"></i> Clear
+                            </button>
+                        </div>
+
+                        <!-- Slide Top Indicators (Category & Progress) -->
+                        <div
+                            class="px-8 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50 select-none">
+                            <div
+                                class="flex items-center gap-3 text-sm font-bold text-brand-500 tracking-wider uppercase">
+                                <span class="w-2.5 h-2.5 rounded-full bg-brand-500 inline-block animate-pulse"></span>
+                                <span id="slide-category">Loading...</span>
+                            </div>
+                            <div class="text-xs text-slate-500 font-mono font-bold" id="slide-index-indicator">SLIDE 01
+                                OF 14</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Footer Navigation Panel (Disappears in Fullscreen to keep view clean) -->
+                <footer id="footer-controls"
+                    class="bg-white border-t border-slate-200 px-8 py-5 flex justify-between items-center gap-4 shrink-0 shadow-sm select-none">
+                    <div class="flex items-center gap-3">
+                        <button onclick="prevSlide()"
+                            class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl text-base text-slate-800 transition font-bold flex items-center gap-2.5 disabled:opacity-30 disabled:cursor-not-allowed"
+                            id="btn-prev">
+                            <i class="fa-solid fa-arrow-left"></i> Prev
+                        </button>
+                        <button onclick="nextSlide()"
+                            class="px-5 py-2.5 bg-brand-600 hover:bg-brand-600/90 border border-blue-800 rounded-xl text-base text-white transition font-bold flex items-center gap-2.5 disabled:opacity-30 disabled:cursor-not-allowed"
+                            id="btn-next">
+                            Next <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Slide Progress Slider -->
+                    <div class="flex-1 max-w-xl hidden md:flex items-center gap-4">
+                        <span class="text-sm text-slate-400 font-mono font-bold">01</span>
+                        <input type="range" id="slide-progress" min="0" max="13" value="0"
+                            class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-500"
+                            oninput="jumpToSlide(parseInt(this.value))">
+                        <span class="text-sm text-slate-400 font-mono font-bold">14</span>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <!-- Whitepaper Toggle -->
+                        <button id="btn-whitepaper-toggle" onclick="toggleWhitepaperMode()"
+                            class="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition duration-150 flex items-center gap-2"
+                            title="Toggle blank drawing canvas">
+                            <i class="fa-solid fa-chalkboard text-emerald-600"></i> Whitepaper
+                        </button>
+
+                        <!-- Laser Pointer Toggle -->
+                        <button id="btn-laser" onclick="toggleLaserPointer()"
+                            class="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition duration-150 flex items-center gap-2"
+                            title="Toggle Laser Pointer">
+                            <i class="fa-solid fa-circle text-rose-500 text-xs"></i> Laser
+                        </button>
+
+                        <!-- Whiteboard Pen Toggle -->
+                        <button id="btn-whiteboard" onclick="toggleWhiteboard()"
+                            class="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition duration-150 flex items-center gap-2"
+                            title="Toggle Whiteboard Drawing">
+                            <i class="fa-solid fa-pen-fancy text-sky-600"></i> Draw
+                        </button>
+
+                        <!-- Toggle Sidebar Outline -->
+                        <button onclick="toggleSidebar()"
+                            class="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition duration-150 flex items-center gap-2">
+                            <i class="fa-solid fa-bars-staggered"></i> Outline
+                        </button>
+
+                        <!-- Toggle Presenter Notes Sidebar -->
+                        <button id="btn-toggle-notes" onclick="toggleNotesSidebar()"
+                            class="px-4 py-2 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-xl text-sm font-semibold text-brand-500 transition duration-150 flex items-center gap-2">
+                            <i class="fa-solid fa-graduation-cap"></i> Sidebar
+                        </button>
+                    </div>
+                </footer>
+
+                <!-- Symmetrical Academic Sub-Footer -->
+                <div
+                    class="bg-slate-200 border-t border-slate-300 px-8 py-3 flex justify-between items-center text-xs md:text-sm text-slate-600 font-semibold shrink-0 tracking-wide select-none shadow-inner">
+                    <div id="academic-footer-date" class="w-1/4 text-left font-mono">July 2026</div>
+                    <div id="academic-footer-topic"
+                        class="w-2/5 text-center truncate font-bold text-brand-600 uppercase tracking-wider">Unit-I:
+                        Challenges of Machine Learning</div>
+                    <div class="w-1/4 text-center text-slate-700 font-mono">Mr. M. Subrahmanyam, Asst. Prof., AIML</div>
+                    <div id="academic-footer-page" class="w-1/4 text-right font-mono text-slate-500">Slide 1 / 14</div>
+                </div>
+            </div>
+
+            <!-- Notes / Simulator Sidebar -->
+            <aside id="notes-sidebar"
+                class="w-[480px] bg-white border-l border-slate-200 flex flex-col transition-all duration-300 shrink-0 shadow-md">
+                <div class="p-1.5 border-b border-slate-200 flex bg-slate-50">
+                    <button id="tab-notes" onclick="setActiveTab('notes')"
+                        class="flex-1 py-2.5 text-center text-xs font-bold rounded-lg transition duration-200 bg-white text-brand-600 border border-slate-200 shadow-sm">
+                        <i class="fa-regular fa-comment-dots mr-1.5 text-brand-500"></i> Lecture Guides
+                    </button>
+                    <button id="tab-sandbox" onclick="setActiveTab('sandbox')"
+                        class="flex-1 py-2.5 text-center text-xs font-bold rounded-lg transition duration-200 text-slate-500 hover:text-slate-800">
+                        <i class="fa-solid fa-flask-vial mr-1.5 text-brand-500"></i> Interactive Lab Sandbox
+                    </button>
+                </div>
+
+                <!-- Tab content container -->
+                <div class="flex-1 overflow-y-auto p-6 space-y-6">
+
+                    <!-- NOTES PANEL -->
+                    <div id="notes-content" class="space-y-6">
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                            <span class="text-xs font-mono font-bold uppercase tracking-widest text-brand-500">Active
+                                Speaker Note</span>
+                            <p id="speaker-note-text" class="text-sm md:text-base leading-relaxed text-slate-700">
+                                Loading notes...</p>
+                        </div>
+
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                            <span
+                                class="text-xs font-mono font-bold uppercase tracking-widest text-emerald-600">Real-World
+                                Case Study</span>
+                            <p id="slide-example-text" class="text-sm md:text-base leading-relaxed text-slate-700">
+                                Loading cases...</p>
+                        </div>
+
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                            <span class="text-xs font-mono font-bold uppercase tracking-widest text-sky-600">Live
+                                Classroom Interaction</span>
+                            <p id="slide-interaction-text" class="text-sm md:text-base leading-relaxed text-slate-700">
+                                Loading prompt...</p>
+                        </div>
+                    </div>
+
+                    <!-- SANDBOX PANEL -->
+                    <div id="sandbox-content" class="hidden space-y-6">
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+                            <span
+                                class="text-xs font-mono font-bold uppercase tracking-widest text-brand-500 block">Generalization
+                                Simulator (Under vs Overfit)</span>
+                            <p class="text-xs text-slate-500 leading-relaxed">Click in the white plotting area below to
+                                add coordinates. Choose different fitting models to see how they capture structural
+                                trends or memorize noise.</p>
+
+                            <!-- Drawing Canvas for Polynomial Overfitting Sandbox -->
+                            <div
+                                class="relative w-full aspect-square bg-white rounded-xl border border-slate-200 overflow-hidden shadow-inner">
+                                <canvas id="sandbox-plot-canvas"
+                                    class="w-full h-full cursor-crosshair bg-white"></canvas>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <button onclick="setSandboxModel('linear')" id="btn-sb-linear"
+                                    class="flex-1 py-2 rounded-lg text-xs font-bold border border-slate-300 bg-white text-slate-700 shadow-sm">Linear
+                                    Fit (Underfit)</button>
+                                <button onclick="setSandboxModel('quadratic')" id="btn-sb-quad"
+                                    class="flex-1 py-2 rounded-lg text-xs font-bold border border-slate-300 bg-white text-slate-700 shadow-sm">Quadratic
+                                    Fit (Target)</button>
+                                <button onclick="setSandboxModel('overfit')" id="btn-sb-overfit"
+                                    class="flex-1 py-2 rounded-lg text-xs font-bold border border-orange-200 bg-orange-50 text-brand-500 shadow-sm">High
+                                    Poly Fit (Overfit)</button>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <button onclick="clearSandboxPoints()"
+                                    class="flex-1 py-2 text-xs font-bold bg-white hover:bg-slate-50 rounded-lg text-rose-600 border border-slate-200 shadow-sm">Reset
+                                    Coordinates</button>
+                            </div>
+                        </div>
+
+                        <!-- Statistical Sampling Bias & Error Simulator -->
+                        <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+                            <span class="text-xs font-mono font-bold uppercase tracking-widest text-sky-600 block">Data
+                                Volume & Generalization Gap Solver</span>
+                            <p class="text-xs text-slate-500 leading-relaxed">Simulate how sample volume (N) and target
+                                error parameters interact to establish mathematical generalization limits.</p>
+
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-[11px] font-mono text-slate-500 flex justify-between">
+                                        <span>Sample Size (N)</span>
+                                        <span id="sb-slider-n-val" class="text-brand-500 font-bold">1500</span>
+                                    </label>
+                                    <input type="range" id="sb-slider-n" min="100" max="10000" step="100" value="1500"
+                                        oninput="updateBoundPlot()"
+                                        class="w-full h-1.5 bg-slate-200 rounded-lg accent-brand-500">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] font-mono text-slate-500 flex justify-between">
+                                        <span>Tolerance Error Threshold (&epsilon;)</span>
+                                        <span id="sb-slider-eps-val" class="text-brand-500 font-bold">0.05</span>
+                                    </label>
+                                    <input type="range" id="sb-slider-eps" min="0.01" max="0.2" step="0.01" value="0.05"
+                                        oninput="updateBoundPlot()"
+                                        class="w-full h-1.5 bg-slate-200 rounded-lg accent-brand-500">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] font-mono text-slate-500 flex justify-between">
+                                        <span>Hypothesis Hyperspace Complexity (M)</span>
+                                        <span id="sb-slider-m-val" class="text-brand-500 font-bold">500</span>
+                                    </label>
+                                    <input type="range" id="sb-slider-m" min="1" max="10000" step="50" value="500"
+                                        oninput="updateBoundPlot()"
+                                        class="w-full h-1.5 bg-slate-200 rounded-lg accent-brand-500">
+                                </div>
+                            </div>
+
+                            <div
+                                class="relative w-full h-40 bg-white rounded-xl border border-slate-200 p-2 overflow-hidden flex flex-col justify-between shadow-inner">
+                                <svg id="bound-curve-svg" class="w-full h-full" viewBox="0 0 300 120"></svg>
+                                <div
+                                    class="text-[10px] font-mono text-center text-slate-500 border-t border-slate-100 pt-1.5">
+                                    Generalization Failure Bound Limit: <span id="sb-calculated-prob"
+                                        class="text-brand-600 font-bold">0.0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- SHORTCUTS DIALOG MODAL -->
+    <div id="help-modal"
+        class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div
+            class="bg-white border border-slate-200 max-w-lg w-full rounded-2xl shadow-2xl p-8 space-y-5 animate-fade-in">
+            <div class="flex justify-between items-center border-b border-slate-200 pb-4">
+                <h3 class="text-lg font-black text-slate-900 flex items-center gap-2">
+                    <i class="fa-regular fa-keyboard text-brand-500"></i> Interactive Presentation Hotkeys
+                </h3>
+                <button onclick="toggleHelpModal()" class="text-slate-500 hover:text-slate-800 transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <div class="space-y-4 text-sm text-slate-600 font-mono">
+                <div class="flex justify-between border-b border-slate-100 pb-2">
+                    <span>Next Slide</span>
+                    <span
+                        class="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded text-xs font-bold text-brand-500">Right
+                        Arrow / Space</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-100 pb-2">
+                    <span>Previous Slide</span>
+                    <span
+                        class="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded text-xs font-bold text-brand-500">Left
+                        Arrow</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-100 pb-2">
+                    <span>Toggle Fullscreen</span>
+                    <span
+                        class="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded text-xs font-bold text-brand-500">F</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-100 pb-2">
+                    <span>Toggle Left Outline</span>
+                    <span
+                        class="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded text-xs font-bold text-brand-500">O</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-100 pb-2">
+                    <span>Toggle Sidebar Notes</span>
+                    <span
+                        class="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded text-xs font-bold text-brand-500">N</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-100 pb-2">
+                    <span>Toggle Whitepaper Workspace</span>
+                    <span
+                        class="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded text-xs font-bold text-brand-500">W</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Toggle Lecture Notes View</span>
+                    <span
+                        class="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded text-xs font-bold text-brand-500">M</span>
+                </div>
+            </div>
+            <div class="pt-2 text-xs text-slate-400 text-center font-bold font-mono">
+                Press ESCAPE to close this helper dialogue.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        let activeTab = 'notes';
+        let lectureMode = 'student';
+        let notesSidebarVisible = true;
+        let whitepaperMode = false;
+        let isPseudoFullscreen = false; // State track for fallback fullscreen
+
+        // Presentation Tool States
+        let laserPointerActive = false;
+        let whiteboardActive = false;
+        let whiteboardDrawing = false;
+        let whiteboardColor = '#ef4444'; // Default red
+        let whiteboardCtx = null;
+        let whiteboardCanvas = null;
+
+        // Interactive Zoom & Pan States
+        let currentZoom = 1.0;
+        let panOffset = { x: 0, y: 0 };
+        let isPanning = false;
+        let panModeActive = false;
+        let startPanCoords = { x: 0, y: 0 };
+
+        // 14 Structured Presentation Slides 
+        const SLIDES = [
+            {
+                title: "The $440 Million Typo",
+                subtitle: "When Algorithms Weaponize Bad Data",
+                category: "Hook Slide",
+                notes: "Welcome, everyone. Today we are stripping away the glamorous hype surrounding Artificial Intelligence to focus on the dangerous realities of deploying these models. Consider the Knight Capital Group flash-crash of 2012. An uncalibrated legacy algorithm executed millions of unintended trades in less than an hour, triggering a $440 million loss. This is the cost of engineering failure. ML algorithms are not magical constructs—they are fragile engines that break down spectacularly under non-representative conditions.",
+                example: "Knight Capital Group's 2012 algorithmic collapse in New York, trading 4 million shares a minute on dead code parameters.",
+                interaction: "How many of you believe that complex algorithms are less vulnerable to input flaws than simple ones? Let's break this myth down.",
+                transition: "Let's first understand how engineering and debugging models directly dictates your career impact.",
+                imageSvg: `
+                    <svg viewBox="0 0 450 220" class="w-full max-h-[300px] bg-slate-50 rounded-2xl p-5 border border-slate-200 shadow-inner">
+                        <text x="20" y="30" fill="#1e3a8a" font-size="12" font-family="monospace" font-weight="bold">ALGORITHMIC PIPELINE FAIL</text>
+                        <rect x="20" y="50" width="110" height="40" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                        <text x="75" y="75" fill="#0f172a" font-size="10" font-weight="bold" text-anchor="middle">Dead Code Input</text>
+                        <path d="M130 70 L170 70" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
+                        
+                        <rect x="170" y="50" width="120" height="40" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="2" class="pulse-element"/>
+                        <text x="230" y="75" fill="#ef4444" font-size="10" font-weight="bold" text-anchor="middle">Wild Loop Exec</text>
+                        <path d="M230 90 L230 120" stroke="#94a3b8" stroke-width="3" marker-end="url(#arrow)"/>
+                        
+                        <rect x="170" y="120" width="120" height="40" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                        <text x="230" y="145" fill="#991b1b" font-size="10" font-weight="bold" text-anchor="middle">-$440M Capital Loss</text>
+                        
+                        <line x1="310" y1="20" x2="310" y2="200" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="6"/>
+                        <circle cx="380" cy="70" r="14" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+                        <circle cx="380" cy="140" r="14" fill="#d1fae5" stroke="#059669" stroke-width="2"/>
+                        <path d="M 380 84 L 380 126" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+                        <text x="380" y="180" fill="#475569" font-size="10" font-weight="bold" text-anchor="middle">Model Drift Limit</text>
+                        <defs>
+                            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                `,
+                content: `
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                        <div class="space-y-6">
+                            <blockquote class="border-l-6 border-orange-500 pl-6 py-3 italic text-slate-700 text-xl md:text-2xl leading-relaxed bg-slate-50 rounded-r-lg">
+                                "The Knight Capital disaster was a textbook case of bad code, zero validation metrics, and uncalibrated models running at speed."
+                                <cite class="block text-base text-slate-500 mt-2 font-bold not-italic font-semibold">— Market Audit Report</cite>
+                            </blockquote>
+                            <div class="space-y-4 text-lg md:text-xl leading-relaxed">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded-full bg-orange-100 text-brand-500 flex items-center justify-center font-black shrink-0 text-lg">1</div>
+                                    <p class="text-slate-600"><strong class="text-slate-900">45 Minutes of Terror:</strong> Systemic failures cascade instantly when models lack real-world out-of-sample data validation filters.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="slide1-img-host" class="w-full flex justify-center"></div>
+                    </div>
+                `
+            },
+            {
+                title: "Why Should We Learn This?",
+                subtitle: "Engineering the Predictive Future",
+                category: "Industry Value",
+                notes: "In Scikit-Learn, writing a model takes only three lines of code using .fit() and .predict(). Commodities have simplified the basic syntax. Your real industrial value as an Aditya University engineering graduate lies in debugging a model when it fails in live production. Transitioning from model-centric to data-centric AI design frameworks is key to protecting business revenue and lives.",
+                example: "Netflix's engineering teams focusing 80% of active sprints on catalog noise reduction and contextual features rather than rewriting the deep learning optimizer code.",
+                interaction: "How many of you spent hours troubleshooting a clean dataset vs writing the code? That is the real industry ratio.",
+                transition: "Let's review the academic outcomes mapping to align our progress.",
+                imageSvg: `
+                    <svg viewBox="0 0 450 200" class="w-full max-h-[300px] bg-slate-50 rounded-2xl p-5 border border-slate-200 shadow-inner">
+                        <g opacity="0.5">
+                            <line x1="30" y1="170" x2="420" y2="170" stroke="#cbd5e1" stroke-width="2"/>
+                            <line x1="30" y1="30" x2="30" y2="170" stroke="#cbd5e1" stroke-width="2"/>
+                        </g>
+                        <!-- Iceberg representation of engineering workload -->
+                        <path d="M 120 170 L 220 50 L 320 170 Z" fill="#dbeafe" stroke="#1e3a8a" stroke-width="3"/>
+                        <line x1="170" y1="110" x2="270" y2="110" stroke="#94a3b8" stroke-dasharray="4"/>
+                        <text x="220" y="90" fill="#1e3a8a" font-size="10" font-weight="bold" text-anchor="middle">Syntax Code (20%)</text>
+                        <text x="220" y="140" fill="#ea580c" font-size="10" font-weight="bold" text-anchor="middle">Data Quality & Validation (80%)</text>
+                        <text x="220" y="185" fill="#475569" font-size="11" font-weight="black" text-anchor="middle">Engineering Realities</text>
+                    </svg>
+                `,
+                content: `
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                        <div class="space-y-6">
+                            <h3 class="text-2xl font-bold text-slate-900 uppercase tracking-wide">Data-Centric Paradigm Shift</h3>
+                            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                                <p class="text-slate-600 text-base md:text-lg leading-relaxed">
+                                    Industry spends billions on model development, but 80% of project failures are caused by bad quality data, noise, bias, and structural feature mismatch.
+                                </p>
+                            </div>
+                        </div>
+                        <div id="slide2-img-host" class="w-full flex justify-center"></div>
+                    </div>
+                `
+            },
+            {
+                title: "Learning Outcomes",
+                subtitle: "University Syllabus Mapping",
+                category: "CO1 Outcomes",
+                notes: "Our goal is operational. By the end of this session, you will confidently diagnose, analyze, and systematically resolve machine learning hurdles, categorizing them into data-related issues and algorithm-related architectural issues.",
+                example: "Aditya University AIML department CO1 target benchmarks.",
+                interaction: "I want you to mark these outcomes. We will audit them step-by-step.",
+                transition: "Let's segment the structural architecture of algorithmic failures.",
+                imageSvg: `
+                    <svg viewBox="0 0 450 140" class="w-full max-h-[200px] bg-slate-50 rounded-2xl p-4 border border-slate-200 shadow-inner">
+                        <g transform="translate(10, 10)">
+                            <line x1="40" y1="50" x2="380" y2="50" stroke="#cbd5e1" stroke-width="4"/>
+                            <circle cx="50" cy="50" r="14" fill="#1e3a8a"/>
+                            <circle cx="160" cy="50" r="14" fill="#ea580c"/>
+                            <circle cx="270" cy="50" r="14" fill="#e11d48"/>
+                            <circle cx="370" cy="50" r="14" fill="#059669"/>
+                            <text x="50" y="85" fill="#1e3a8a" font-size="8" font-weight="bold" text-anchor="middle">CLASSIFY</text>
+                            <text x="160" y="85" fill="#ea580c" font-size="8" font-weight="bold" text-anchor="middle">DIAGNOSE</text>
+                            <text x="270" y="85" fill="#e11d48" font-size="8" font-weight="bold" text-anchor="middle">EVALUATE</text>
+                            <text x="370" y="85" fill="#059669" font-size="8" font-weight="bold" text-anchor="middle">SOLVE</text>
+                        </g>
+                    </svg>
+                `,
+                content: `
+                    <div class="space-y-4 max-w-2xl mx-auto">
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 flex items-center gap-5 shadow-sm">
+                            <span class="w-10 h-10 shrink-0 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg">1</span>
+                            <span class="text-base md:text-lg font-semibold text-slate-700">Classify failures into Data constraints or Algorithmic constraints.</span>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 flex items-center gap-5 shadow-sm">
+                            <span class="w-10 h-10 shrink-0 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center font-bold text-lg">2</span>
+                            <span class="text-base md:text-lg font-semibold text-slate-700">Diagnose the mathematical signature of Overfitting vs Underfitting.</span>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 flex items-center gap-5 shadow-sm">
+                            <span class="w-10 h-10 shrink-0 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">3</span>
+                            <span class="text-base md:text-lg font-semibold text-slate-700">Apply mitigation strategies like regularization and dimensional pruning.</span>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Data vs. Algorithm Failures",
+                subtitle: "Anatomy of Machine Learning Obstacles",
+                category: "Failure Sorter",
+                notes: "To systematically fix model errors, we must divide issues into two categories: the input fuel (Data Quality) and the engine design (Algorithmic Capacity). Let's use our custom classifier sorting workspace below to categorize these components.",
+                example: "Differentiating sensor dropouts (Data Noise) from linear parameter boundaries trying to fit non-linear sinusoidal curves (Underfitting).",
+                interaction: "Try sorting these components and observe their impact on system performance.",
+                transition: "Let's first inspect Data Challenge 1: Insufficient Volume.",
+                hasInteractiveDemo: "failureSorter",
+                content: ""
+            },
+            {
+                title: "Challenge 1: Insufficient Data Volume",
+                subtitle: "The Scale Deficiency",
+                category: "Data Volume",
+                notes: "Humans generalize concept-mappings almost immediately. A toddler sees two photos of a tiger and recognizes a real tiger from any visual perspective. For a computer vision neural net, we require thousands or millions of training rows just to build generalizable edge-transition weights. Small volumes trigger instant overfitting because the network memorizes background patterns instead of extracting true concept features.",
+                example: "Training rare disease classifiers on fewer than 100 historical biopsy images leads to massive overfit metrics.",
+                interaction: "How many images of cats does a toddler need to learn the concept of a cat? How many does a deep neural network need? Think about this mismatch.",
+                transition: "Let's explore what happens when we have a massive volume of data, but it represents a biased slice of reality.",
+                imageSvg: `
+                    <svg viewBox="0 0 450 180" class="w-full max-h-[300px] bg-slate-50 rounded-2xl p-5 border border-slate-200 shadow-inner">
+                        <!-- Human child vs neural net data requirement -->
+                        <g transform="translate(40, 40)">
+                            <circle cx="40" cy="40" r="20" fill="#fff" stroke="#1e3a8a" stroke-width="2"/>
+                            <text x="40" y="44" fill="#1e3a8a" font-size="10" font-weight="bold" text-anchor="middle">Toddler</text>
+                            <text x="40" y="90" fill="#475569" font-size="9" font-weight="bold" text-anchor="middle">Requires: 1-2 examples</text>
+                        </g>
+                        <g transform="translate(240, 40)">
+                            <rect x="20" y="10" width="120" height="60" rx="8" fill="#fff" stroke="#ea580c" stroke-width="2"/>
+                            <text x="80" y="45" fill="#ea580c" font-size="10" font-weight="bold" text-anchor="middle">Neural Net Engine</text>
+                            <text x="80" y="90" fill="#475569" font-size="9" font-weight="bold" text-anchor="middle">Requires: 10,000+ examples</text>
+                        </g>
+                    </svg>
+                `,
+                content: `
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                        <div class="space-y-6">
+                            <h3 class="text-2xl font-bold text-slate-900 font-mono">The Volume Disconnect</h3>
+                            <p class="text-slate-600 text-base md:text-lg leading-relaxed">
+                                As models increase in parameter complexity (like Deep Neural Nets), the amount of required data to secure mathematical bounds scales exponentially. Without sufficient data, the algorithm memorizes coordinates rather than learning relationships.
+                            </p>
+                        </div>
+                        <div id="slide5-img-host" class="w-full flex justify-center"></div>
+                    </div>
+                `
+            },
+            {
+                title: "Challenge 2: Non-Representative Data",
+                subtitle: "The 1936 Literary Digest Poll Fiasco",
+                category: "Sampling Bias",
+                notes: "If your training data doesn't represent the environment where the model is deployed, you will experience catastrophic real-world failures. Look at the famous 1936 Literary Digest Poll. They gathered a massive volume of 2.3 million replies but mispredicted the US election completely because their subscriber lists overrepresented wealthier citizens with telephones and cars during the Great Depression. Let's run a live simulation of this bias.",
+                example: "Deploying autonomous delivery vehicle vision models trained entirely in sunny California on the snowy, dark streets of Chicago.",
+                interaction: "Use the sliders below to see how phone directory sampling shifts predictions away from the true population vote.",
+                transition: "Now, let's look at what happens when data is plentiful and balanced, but individually corrupted by noise.",
+                hasInteractiveDemo: "samplingBiasDemo",
+                content: ""
+            },
+            {
+                title: "Challenge 3: Poor-Quality Data & Noise",
+                subtitle: "Sensor Contamination & Outliers",
+                category: "Data Noise",
+                notes: "Noise is unwanted variance or measurement distortion that shifts actual data points away from their true coordinate paths. When a dataset is highly noisy, algorithms expend their parameter optimization budget tracking random spikes rather than the underlying physical pattern. Let's analyze this using Dr. Krishnachandran's lecture frameworks.",
+                example: "Faulty temperature sensors in factory machinery reporting erratic reading spikes due to electrical field interference.",
+                interaction: "Discuss with your teammate: How can we identify the difference between a natural outlier and a faulty corrupted data point?",
+                transition: "Even with high-volume, clean, representative data, we can still drown our model by providing completely irrelevant metrics.",
+                imageSvg: `
+                    <svg viewBox="0 0 450 180" class="w-full max-h-[300px] bg-slate-50 rounded-2xl p-5 border border-slate-200 shadow-inner">
+                        <path d="M 30 150 L 400 50" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4"/>
+                        <!-- True function path vs noisy samples -->
+                        <path d="M 30 150 Q 150 120 200 80 T 400 50" fill="none" stroke="#1e3a8a" stroke-width="3"/>
+                        <circle cx="80" cy="110" r="5" fill="#ef4444" class="pulse-element"/>
+                        <circle cx="150" cy="130" r="5" fill="#ef4444"/>
+                        <circle cx="280" cy="40" r="5" fill="#ef4444"/>
+                        <text x="80" y="95" fill="#ef4444" font-size="9" font-family="monospace" font-weight="bold">Outlier Noise</text>
+                    </svg>
+                `,
+                content: `
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                        <div class="space-y-4">
+                            <h3 class="text-2xl font-bold text-slate-900 font-mono">The Cost of Distorted Signals</h3>
+                            <p class="text-slate-500 text-base md:text-lg leading-relaxed">
+                                Noise leads to high variance and corrupts the training objective. Preprocessing techniques like median filtering, clustering-based outlier exclusion, and double-entry validation are essential to restore signal geometry.
+                            </p>
+                        </div>
+                        <div id="slide7-img-host" class="w-full flex justify-center"></div>
+                    </div>
+                `
+            },
+            {
+                title: "Challenge 4: Irrelevant Features",
+                subtitle: "The Curse of Dimensionality",
+                category: "Dimensionality",
+                notes: "When we feed redundant or unrelated columns into our model (e.g., predicting credit risk using favorite color or zodiac sign), the model discovers spurious mathematical alignments. High-dimensional feature spaces dilute structural trends and increase computational cost. Let's test the Curse of Dimensionality inside our visual space laboratory.",
+                example: "Including unique Transaction ID strings as input attributes, which models learn to memorize as perfect but completely useless predictors.",
+                interaction: "Toggle dimensions below to observe how data coordinates become sparse as the number of features increases.",
+                transition: "Now that we have analyzed data failures, let's explore algorithmic challenges, beginning with the over-zealous learner.",
+                hasInteractiveDemo: "curseOfDim",
+                content: ""
+            },
+            {
+                title: "Challenge 5: Overfitting",
+                subtitle: "The Over-Zealous Learner",
+                category: "Overfitting",
+                notes: "Overfitting occurs when our model maps the specific coordinates of our training data too closely, memorizing random noise rather than general patterns. The model has low bias but high variance. Let's look at the textbook signature: training error is near 0%, but testing error on unseen data is high. We can resolve this using regularization, simplification, or data volume scaling.",
+                example: "A stock market trading model that generates massive simulated profits on backtests, but loses capital instantly when deployed in live markets.",
+                interaction: "Think about a student who memorizes exact numbers on homework problems but fails on the final exam when the professor changes the numeric values slightly.",
+                transition: "Let's explore the opposite challenge where our model is too simple to learn anything at all.",
+                imageSvg: `
+                    <svg viewBox="0 0 450 180" class="w-full max-h-[300px] bg-slate-50 rounded-2xl p-5 border border-slate-200 shadow-inner">
+                        <!-- Overfitted complex line cutting through all dots -->
+                        <path d="M 30 150 Q 70 40 120 160 T 250 30 T 400 150" fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="2"/>
+                        <circle cx="70" cy="80" r="5" fill="#1e3a8a"/>
+                        <circle cx="150" cy="120" r="5" fill="#1e3a8a"/>
+                        <circle cx="280" cy="50" r="5" fill="#1e3a8a"/>
+                        <circle cx="350" cy="110" r="5" fill="#1e3a8a"/>
+                        <text x="220" y="165" fill="#ef4444" font-size="10" font-family="monospace" font-weight="bold" text-anchor="middle">Erratic Boundary fits noise perfectly</text>
+                    </svg>
+                `,
+                content: `
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                        <div class="space-y-4">
+                            <h3 class="text-2xl font-bold text-slate-900">Memorization vs. Generalization</h3>
+                            <p class="text-slate-600 text-base md:text-lg leading-relaxed">
+                                An overfitted model creates an overly complex decision boundary that captures random noise and fails to generalize to unseen test data. To fix overfitting, we can simplify the model architecture, gather more training data, or apply regularization constraints to penalize heavy parameters.
+                            </p>
+                        </div>
+                        <div id="slide9-img-host" class="w-full flex justify-center"></div>
+                    </div>
+                `
+            },
+            {
+                title: "Challenge 6: Underfitting",
+                subtitle: "The Rigid Learner",
+                category: "Underfitting",
+                notes: "Underfitting occurs when our model lacks the complexity needed to map underlying relationships. This is high bias. Look at the signature: both training error and validation error are high. Forcing a straight linear boundary to fit a curved sinusoidal pattern is a classic example. We can resolve this by selecting a model with higher complexity, engineering richer features, or reducing regularization constraints.",
+                example: "Trying to predict global housing prices based solely on square footage using simple linear regression.",
+                interaction: "If your model has high training error and high validation error, will gathering more data solve the problem? Let's discuss.",
+                transition: "This brings us to the core engineering paradox that every data scientist balances daily: the bias-variance tradeoff.",
+                imageSvg: `
+                    <svg viewBox="0 0 450 180" class="w-full max-h-[300px] bg-slate-50 rounded-2xl p-5 border border-slate-200 shadow-inner">
+                        <!-- Linear underfit boundary failing to capture curved trend -->
+                        <line x1="30" y1="140" x2="400" y2="60" stroke="#ef4444" stroke-width="4"/>
+                        <circle cx="100" cy="50" r="5" fill="#1e3a8a"/>
+                        <circle cx="200" cy="140" r="5" fill="#1e3a8a"/>
+                        <circle cx="300" cy="60" r="5" fill="#1e3a8a"/>
+                        <text x="220" y="165" fill="#ef4444" font-size="10" font-family="monospace" font-weight="bold" text-anchor="middle">Model is too rigid to map the curve</text>
+                    </svg>
+                `,
+                content: `
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                        <div class="space-y-4">
+                            <h3 class="text-2xl font-bold text-slate-900 font-mono">Structural Oversimplification</h3>
+                            <p class="text-slate-600 text-base md:text-lg leading-relaxed">
+                                Underfitting occurs when your algorithm is too simple to capture patterns in the data. To resolve this, choose a more powerful model architecture, engineer richer polynomial features, or reduce regularization constraints.
+                            </p>
+                        </div>
+                        <div id="slide10-img-host" class="w-full flex justify-center"></div>
+                    </div>
+                `
+            },
+            {
+                title: "The Bias-Variance Tradeoff",
+                subtitle: "The Mathematical Tug-of-War",
+                category: "Model Tradeoffs",
+                notes: "Every design decision we make balances bias and variance. As model complexity increases, bias decreases but variance increases. Finding the optimal sweet spot is crucial to minimizing total error. Let's experiment with this tradeoff in real-time.",
+                example: "Adjusting regularization strength in neural networks to prevent overfitting while maintaining predictive accuracy.",
+                interaction: "Slide the complexity level on our interactive chart below to find the sweet spot where total error is minimized.",
+                transition: "Let's apply these diagnostic tools to an active real-world case study.",
+                hasInteractiveDemo: "biasVarianceTradeoff",
+                content: ""
+            },
+            {
+                title: "Case Study: Project Autopilot",
+                subtitle: "Autonomous Drone Diagnostics Lab",
+                category: "Case Study",
+                notes: "Let's assume you are the Lead AI Architect for a drone startup. Your model achieves 99.4% accuracy in simulation, but drops to 61.2% in real-world environments. The drone gets confused by moving leaves and misses delivery boxes entirely. Let's fix this in our diagnostic simulation lab.",
+                example: "Real-world testing failures caused by domain gaps and overfitting to simulation environments.",
+                interaction: "Adjust the model parameters, data volume, and noise filtering to restore flight accuracy to 95%+",
+                transition: "Excellent diagnostics. Let's summarize the key takeaways of our lecture.",
+                hasInteractiveDemo: "droneAutopilotLab",
+                content: ""
+            },
+            {
+                title: "Lecture Summary",
+                subtitle: "One-Minute Revision Cheat-Sheet",
+                category: "Revision Map",
+                notes: "Let's recap what we've learned. Data quality and quantity are our primary foundations. Ensure high data volume, representativeness, and clean features to avoid garbage-in, garbage-out. For models, remember that Overfitting is high variance and Underfitting is high bias. Use cross-validation to verify model performance before live deployment.",
+                example: "Practice exam metrics testing model bias-variance calculations.",
+                interaction: "Let's do a rapid-fire review of these core principles.",
+                transition: "Let's close with some practice problems to prepare you for examinations and lab evaluations.",
+                imageSvg: `
+                    <svg viewBox="0 0 450 180" class="w-full max-h-[300px] bg-slate-50 rounded-2xl p-5 border border-slate-200 shadow-inner">
+                        <g fill="none" stroke="#cbd5e1" stroke-width="2">
+                            <rect x="20" y="30" width="110" height="100" rx="8" fill="#eff6ff" stroke="#1e3a8a"/>
+                            <rect x="170" y="30" width="110" height="100" rx="8" fill="#fff7ed" stroke="#ea580c"/>
+                            <rect x="320" y="30" width="110" height="100" rx="8" fill="#fcf7f7" stroke="#e11d48"/>
+                        </g>
+                        <g font-size="9" font-family="monospace" font-weight="bold" fill="#0f172a" text-anchor="middle">
+                            <text x="75" y="65">1. DATA</text>
+                            <text x="75" y="80" fill="#1e3a8a" font-size="7">Volume & Represent</text>
+                            
+                            <text x="225" y="65">2. NOISE</text>
+                            <text x="225" y="80" fill="#ea580c" font-size="7">Outliers & Cleaning</text>
+                            
+                            <text x="375" y="65">3. MODEL</text>
+                            <text x="375" y="80" fill="#e11d48" font-size="7">Over/Underfit Sweetspot</text>
+                        </g>
+                    </svg>
+                `,
+                content: `
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center animate-fade-in">
+                        <div class="space-y-4">
+                            <h3 class="text-2xl font-black text-slate-900 font-mono">Generalization Best Practices</h3>
+                            <ul class="space-y-3 text-base md:text-lg text-slate-600 font-medium">
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500"></i> Validate model representativeness early.</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500"></i> Clean noise, outliers, and redundant dimensions.</li>
+                                <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500"></i> Track training vs. validation curves continuously.</li>
+                            </ul>
+                        </div>
+                        <div id="slide13-img-host" class="w-full flex justify-center"></div>
+                    </div>
+                `
+            },
+            {
+                title: "Discussion & Practice Problems",
+                subtitle: "Class Evaluation Matrix",
+                category: "CO1 Evaluation",
+                notes: "These questions are directly aligned with your university syllabus and course outcomes. Take time to work through these problems with your study groups to prepare for mid-term exams and lab evaluations.",
+                example: "Practice exam metrics testing model bias-variance calculations.",
+                interaction: "Use the live calculators below to solve common test questions instantly.",
+                transition: "Ready to test? Explore the Live Sandbox panel on the right sidebar at any time for visual experiments!",
+                hasInteractiveDemo: "practiceCalculators",
+                content: ""
+            }
+        ];
+
+        function initSidebarOutline() {
+            const listContainer = document.getElementById('outline-list');
+            listContainer.innerHTML = '';
+
+            SLIDES.forEach((slide, idx) => {
+                const btn = document.createElement('button');
+                btn.onclick = () => jumpToSlide(idx);
+                btn.id = `outline-btn-${idx}`;
+                btn.className = `w-full text-left px-4 py-3 rounded-xl text-xs font-semibold transition duration-150 flex items-center gap-3 ${idx === currentSlide
+                    ? 'bg-brand-600 text-white shadow-md'
+                    : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                    }`;
+                btn.innerHTML = `
+                    <span class="font-mono text-[10px] opacity-60 shrink-0 font-bold">${(idx + 1).toString().padStart(2, '0')}</span>
+                    <span class="truncate flex-1">${slide.title}</span>
+                `;
+                listContainer.appendChild(btn);
+            });
+        }
+
+        function jumpToSlide(index) {
+            if (index < 0 || index >= SLIDES.length) return;
+            if (whitepaperMode) {
+                toggleWhitepaperMode();
+            }
+            currentSlide = index;
+            resetZoom();
+            renderCurrentSlide();
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                jumpToSlide(currentSlide - 1);
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < SLIDES.length - 1) {
+                jumpToSlide(currentSlide + 1);
+            }
+        }
+
+        function toggleNotesSidebar() {
+            notesSidebarVisible = !notesSidebarVisible;
+            const sidebar = document.getElementById('notes-sidebar');
+            const btn = document.getElementById('btn-toggle-notes');
+            if (notesSidebarVisible) {
+                sidebar.className = "w-[480px] bg-white border-l border-slate-200 flex flex-col transition-all duration-300 shrink-0 shadow-md";
+                btn.className = "px-4 py-2 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-xl text-sm font-semibold text-brand-500 transition duration-150 flex items-center gap-2";
+            } else {
+                sidebar.className = "w-0 bg-white flex flex-col transition-all duration-300 shrink-0 overflow-hidden";
+                btn.className = "px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl text-sm font-semibold text-slate-600 transition duration-150 flex items-center gap-2";
+            }
+        }
+
+        function toggleMode(mode) {
+            lectureMode = mode;
+            document.getElementById('btn-student-mode').className = mode === 'student'
+                ? "px-4 py-2 rounded-lg text-sm font-semibold transition duration-200 flex items-center gap-2 text-brand-500 bg-white border border-slate-200 shadow-sm"
+                : "px-4 py-2 rounded-lg text-sm font-semibold transition duration-200 flex items-center gap-2 text-slate-600 hover:text-slate-900";
+
+            document.getElementById('btn-teacher-mode').className = mode === 'teacher'
+                ? "px-4 py-2 rounded-lg text-sm font-semibold transition duration-200 flex items-center gap-2 text-brand-500 bg-white border border-slate-200 shadow-sm"
+                : "px-4 py-2 rounded-lg text-sm font-semibold transition duration-200 flex items-center gap-2 text-slate-600 hover:text-slate-900";
+
+            renderCurrentSlide();
+        }
+
+        function setActiveTab(tab) {
+            activeTab = tab;
+            const tabNotes = document.getElementById('tab-notes');
+            const tabSandbox = document.getElementById('tab-sandbox');
+            const panelNotes = document.getElementById('notes-content');
+            const panelSandbox = document.getElementById('sandbox-content');
+
+            if (tab === 'notes') {
+                tabNotes.className = "flex-1 py-2.5 text-center text-xs font-bold rounded-lg transition duration-200 bg-white text-brand-600 border border-slate-200 shadow-sm";
+                tabSandbox.className = "flex-1 py-2.5 text-center text-xs font-bold rounded-lg transition duration-200 text-slate-500 hover:text-slate-800";
+                panelNotes.classList.remove('hidden');
+                panelSandbox.classList.add('hidden');
+            } else {
+                tabSandbox.className = "flex-1 py-2.5 text-center text-xs font-bold rounded-lg transition duration-200 bg-white text-brand-600 border border-slate-200 shadow-sm";
+                tabNotes.className = "flex-1 py-2.5 text-center text-xs font-bold rounded-lg transition duration-200 text-slate-500 hover:text-slate-800";
+                panelNotes.classList.add('hidden');
+                panelSandbox.classList.remove('hidden');
+            }
+        }
+
+        function adjustZoom(factor) {
+            currentZoom = Math.min(Math.max(currentZoom + factor, 0.5), 3.0);
+            applyZoomTransform();
+        }
+
+        function resetZoom() {
+            currentZoom = 1.0;
+            panOffset = { x: 0, y: 0 };
+            applyZoomTransform();
+        }
+
+        function togglePanMode() {
+            panModeActive = !panModeActive;
+            applyZoomTransform();
+        }
+
+        function applyZoomTransform() {
+            const wrapper = document.getElementById('zoom-content-wrapper');
+            if (wrapper) {
+                wrapper.style.transform = `translate(${panOffset.x}px, ${panOffset.y}px) scale(${currentZoom})`;
+            }
+            const indicator = document.getElementById('zoom-factor-indicator');
+            if (indicator) {
+                indicator.innerText = `${Math.round(currentZoom * 100)}%`;
+            }
+
+            const panBtn = document.getElementById('btn-pan-mode');
+            if (panBtn) {
+                if (panModeActive) {
+                    panBtn.className = "w-7 h-7 rounded-lg bg-orange-100 border border-orange-200 text-brand-500 flex items-center justify-center text-xs transition shadow-sm";
+                } else {
+                    panBtn.className = "w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-center text-[11px] transition";
+                }
+            }
+        }
+
+        function toggleFullscreen() {
+            const container = document.documentElement;
+
+            if (!document.fullscreenElement && !isPseudoFullscreen) {
+                // Try executing native browser fullscreen first
+                container.requestFullscreen().then(() => {
+                    document.getElementById('fullscreen-icon').className = "fa-solid fa-compress";
+                }).catch(err => {
+                    // Fallback to high-fidelity simulated pseudo-fullscreen inside the preview sandbox safely
+                    console.warn("Fullscreen permission blocked inside iframe container. Activating pseudo-fullscreen mode.");
+                    enablePseudoFullscreen();
+                });
+            } else {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen().then(() => {
+                        document.getElementById('fullscreen-icon').className = "fa-solid fa-expand";
+                    }).catch(() => {
+                        disablePseudoFullscreen();
+                    });
+                } else {
+                    disablePseudoFullscreen();
+                }
+            }
+        }
+
+        function enablePseudoFullscreen() {
+            isPseudoFullscreen = true;
+            document.documentElement.classList.add('pseudo-fullscreen');
+            document.getElementById('fullscreen-icon').className = "fa-solid fa-compress";
+            setTimeout(resizeWhiteboardCanvas, 150);
+        }
+
+        function disablePseudoFullscreen() {
+            isPseudoFullscreen = false;
+            document.documentElement.classList.remove('pseudo-fullscreen');
+            document.getElementById('fullscreen-icon').className = "fa-solid fa-expand";
+            setTimeout(resizeWhiteboardCanvas, 150);
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('outline-sidebar');
+            sidebar.classList.toggle('w-80');
+            sidebar.classList.toggle('w-0');
+            sidebar.classList.toggle('overflow-hidden');
+        }
+
+        function toggleHelpModal() {
+            const modal = document.getElementById('help-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function toggleWhitepaperMode() {
+            whitepaperMode = !whitepaperMode;
+            const overlay = document.getElementById('whitepaper-overlay');
+            const btn = document.getElementById('btn-whitepaper-toggle');
+
+            if (whitepaperMode) {
+                overlay.classList.remove('hidden');
+                btn.innerHTML = `<i class="fa-solid fa-chalkboard text-yellow-500"></i> Slide Deck`;
+                btn.className = "px-4 py-2 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-xl text-sm font-semibold text-brand-500 transition duration-150 flex items-center gap-2 shadow-inner";
+                if (!whiteboardActive) {
+                    toggleWhiteboard();
+                }
+            } else {
+                overlay.classList.add('hidden');
+                btn.innerHTML = `<i class="fa-solid fa-chalkboard text-emerald-600"></i> Whitepaper`;
+                btn.className = "px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition duration-150 flex items-center gap-2";
+                clearWhiteboard();
+                if (whiteboardActive) {
+                    toggleWhiteboard();
+                }
+            }
+        }
+
+        function renderCurrentSlide() {
+            const slide = SLIDES[currentSlide];
+
+            clearWhiteboard();
+            resizeWhiteboardCanvas();
+
+            SLIDES.forEach((_, idx) => {
+                const btn = document.getElementById(`outline-btn-${idx}`);
+                if (btn) {
+                    if (idx === currentSlide) {
+                        btn.className = "w-full text-left px-4 py-3 rounded-xl text-xs font-semibold transition duration-150 flex items-center gap-3 bg-brand-600 text-white shadow-md";
+                    } else {
+                        btn.className = "w-full text-left px-4 py-3 rounded-xl text-xs font-semibold transition duration-150 flex items-center gap-3 text-slate-600 hover:bg-slate-200 hover:text-slate-900";
+                    }
+                }
+            });
+
+            document.getElementById('slide-category').innerText = slide.category;
+            document.getElementById('slide-index-indicator').innerText = `SLIDE ${(currentSlide + 1).toString().padStart(2, '0')} OF ${SLIDES.length}`;
+            document.getElementById('slide-ratio-counter').innerText = `Slide ${currentSlide + 1} / ${SLIDES.length}`;
+            document.getElementById('slide-progress').value = currentSlide;
+
+            document.getElementById('academic-footer-page').innerText = `Slide ${currentSlide + 1} / ${SLIDES.length}`;
+            document.getElementById('academic-footer-topic').innerText = `Topic: ${slide.title}`;
+
+            document.getElementById('btn-prev').disabled = currentSlide === 0;
+            document.getElementById('btn-next').disabled = currentSlide === SLIDES.length - 1;
+
+            // Set Notes Sidebars
+            document.getElementById('speaker-note-text').innerText = slide.notes;
+            document.getElementById('slide-example-text').innerText = slide.example;
+            document.getElementById('slide-interaction-text').innerText = slide.interaction;
+
+            const stage = document.getElementById('slide-stage');
+            stage.className = "slide-enter flex-1 flex flex-col justify-center p-6 md:p-10";
+
+            setTimeout(() => {
+                stage.classList.add('slide-active');
+            }, 50);
+
+            // Render interactive custom labs if triggered with enhanced text sizes
+            if (slide.hasInteractiveDemo) {
+                stage.innerHTML = renderInteractiveDemo(slide.hasInteractiveDemo);
+                initializeDemoLogic(slide.hasInteractiveDemo);
+            } else {
+                stage.innerHTML = `
+                    <div class="space-y-8 max-w-full">
+                        <div class="space-y-3">
+                            <h2 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900 leading-tight uppercase font-sans">${slide.title}</h2>
+                            <h3 class="text-xl md:text-3xl font-extrabold text-brand-500 font-mono tracking-wider">${slide.subtitle}</h3>
+                        </div>
+                        <div class="w-full border-t-2 border-slate-200 my-4"></div>
+                        <div class="flex-1 min-h-[300px] flex items-center justify-center">
+                            ${slide.content}
+                        </div>
+                    </div>
+                `;
+
+                const imgHost = document.getElementById(`slide${currentSlide + 1}-img-host`);
+                if (imgHost && slide.imageSvg) {
+                    imgHost.innerHTML = slide.imageSvg;
+                }
+            }
+        }
+
+        function renderInteractiveDemo(demoKey) {
+            if (demoKey === 'failureSorter') {
+                return `
+                    <div class="space-y-8 w-full max-w-5xl mx-auto flex flex-col h-full justify-center">
+                        <div class="space-y-3">
+                            <h2 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900 uppercase">Interactive Failure Sorter</h2>
+                            <h3 class="text-xl md:text-3xl font-bold text-brand-500 font-mono">Drag or click to classify machine learning failures:</h3>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                            <!-- Items -->
+                            <div class="space-y-4">
+                                <span class="text-sm font-bold text-slate-400 uppercase tracking-widest block font-mono">ML Challenge Cards</span>
+                                <div id="sorter-cards" class="space-y-3">
+                                    <div onclick="sortItem('data', this)" class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-brand-500 transition font-bold text-sm md:text-base">A. Corrupted telemetry sensors (Noise)</div>
+                                    <div onclick="sortItem('algorithm', this)" class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-brand-500 transition font-bold text-sm md:text-base">B. Underfitted linear model boundaries</div>
+                                    <div onclick="sortItem('data', this)" class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-brand-500 transition font-bold text-sm md:text-base">C. Biased phone subscriber directories</div>
+                                    <div onclick="sortItem('algorithm', this)" class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-brand-500 transition font-bold text-sm md:text-base">D. Overfitted high-degree polynomials</div>
+                                </div>
+                            </div>
+                            <!-- Data Bucket -->
+                            <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-5">
+                                <span class="text-sm font-mono font-bold uppercase tracking-widest text-brand-500 block text-center">Data Quality Bucket</span>
+                                <div id="bucket-data" class="min-h-[180px] border-2 border-dashed border-slate-200 rounded-xl p-4 space-y-3 flex flex-col justify-center items-center text-slate-400 text-sm md:text-base text-center">
+                                    Click data metrics cards to sort
+                                </div>
+                            </div>
+                            <!-- Algorithm Bucket -->
+                            <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-5">
+                                <span class="text-sm font-mono font-bold uppercase tracking-widest text-sky-600 block text-center">Algorithmic Design Bucket</span>
+                                <div id="bucket-algorithm" class="min-h-[180px] border-2 border-dashed border-slate-200 rounded-xl p-4 space-y-3 flex flex-col justify-center items-center text-slate-400 text-sm md:text-base text-center">
+                                    Click algorithmic design cards to sort
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (demoKey === 'samplingBiasDemo') {
+                return `
+                    <div class="space-y-8 w-full max-w-5xl mx-auto flex flex-col h-full justify-center animate-fade-in">
+                        <div class="space-y-3">
+                            <h2 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900 uppercase">Literary Digest Bias Sandbox</h2>
+                            <h3 class="text-xl md:text-3xl font-bold text-brand-500 font-mono">Sampling Bias Visualizer</h3>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="text-sm font-mono text-slate-500 flex justify-between mb-2">
+                                        <span>Phone Directory Bias Weight</span>
+                                        <span id="bias-weight-val" class="text-brand-500 font-bold">80%</span>
+                                    </label>
+                                    <input type="range" id="slider-bias-weight" min="0" max="100" value="80" oninput="updateSamplingBias()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-500">
+                                </div>
+                                <div class="bg-white p-5 rounded-xl border border-slate-200 text-sm md:text-base leading-relaxed font-mono">
+                                    Real voting split: FDR (60.8%) vs Landon (36.5%). <br>
+                                    Observe how high phone directory weights skew sample metrics to Landon!
+                                </div>
+                            </div>
+                            <div class="bg-white p-8 rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm text-center">
+                                <span class="text-xs font-mono font-bold uppercase tracking-widest text-slate-400">Sample Prediction Outcomes</span>
+                                <div class="grid grid-cols-2 gap-6 mt-4">
+                                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                                        <span class="text-xs text-slate-400 font-bold block font-mono">FDR Sample Vote</span>
+                                        <span id="sample-fdr-val" class="text-2xl font-black font-mono text-emerald-600">--</span>
+                                    </div>
+                                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                                        <span class="text-xs text-slate-400 font-bold block font-mono">Landon Sample Vote</span>
+                                        <span id="sample-landon-val" class="text-2xl font-black font-mono text-rose-600">--</span>
+                                    </div>
+                                </div>
+                                <div class="mt-6 text-sm md:text-base font-bold font-mono" id="sample-bias-verdict">--</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (demoKey === 'curseOfDim') {
+                return `
+                    <div class="space-y-8 w-full max-w-5xl mx-auto flex flex-col h-full justify-center">
+                        <div class="space-y-3">
+                            <h2 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900 uppercase">The Curse of Dimensionality</h2>
+                            <h3 class="text-xl md:text-3xl font-bold text-brand-500 font-mono">Coordinate Density Laboratory</h3>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                            <div class="space-y-6">
+                                <p class="text-slate-600 text-base md:text-lg leading-relaxed">Choose the space dimensions and observe how spatial coordinates become empty (sparse) as dimensions increase, diluting generalization bounds:</p>
+                                <div class="flex flex-wrap gap-3">
+                                    <button onclick="setDimensionSpace(1)" id="btn-dim-1" class="flex-1 min-w-[120px] py-3 rounded-lg text-sm font-bold border border-orange-200 bg-orange-50 text-brand-500">1-D Space (Axis)</button>
+                                    <button onclick="setDimensionSpace(2)" id="btn-dim-2" class="flex-1 min-w-[120px] py-3 rounded-lg text-sm font-bold border border-slate-200 bg-white text-slate-600">2-D Space (Plane)</button>
+                                    <button onclick="setDimensionSpace(3)" id="btn-dim-3" class="flex-1 min-w-[120px] py-3 rounded-lg text-sm font-bold border border-slate-200 bg-white text-slate-600">3-D Space (Volume)</button>
+                                </div>
+                            </div>
+                            <div class="bg-white p-8 rounded-xl border border-slate-200 flex flex-col justify-between shadow-inner">
+                                <div class="text-center font-mono space-y-3">
+                                    <span class="text-xs text-slate-400 uppercase tracking-widest block font-mono">Sparsity Calculation Metric</span>
+                                    <div class="text-3xl font-black text-slate-800" id="sparsity-factor-val">0.0% Sparsity</div>
+                                    <p class="text-sm text-slate-500" id="sparsity-desc-val">Loading data density matrix...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (demoKey === 'biasVarianceTradeoff') {
+                return `
+                    <div class="space-y-8 w-full max-w-5xl mx-auto flex flex-col h-full justify-center animate-fade-in">
+                        <div class="space-y-3">
+                            <h2 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900 uppercase">Tradeoff Curve Visualizer</h2>
+                            <h3 class="text-xl md:text-3xl font-bold text-brand-500 font-mono">The Optimal Balance</h3>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="text-sm font-mono text-slate-500 flex justify-between mb-2">
+                                        <span>Model Parameter Complexity</span>
+                                        <span id="complexity-val" class="text-brand-500 font-bold">5.0</span>
+                                    </label>
+                                    <input type="range" id="slider-complexity" min="1" max="10" step="0.5" value="5.0" oninput="updateTradeoffCurves()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-500">
+                                </div>
+                                <div class="bg-white p-6 rounded-xl border border-slate-200 text-sm md:text-base font-mono space-y-2 shadow-sm">
+                                    <div>Bias (Underfit): <span id="val-bias" class="text-rose-500 font-bold">--</span></div>
+                                    <div>Variance (Overfit): <span id="val-variance" class="text-blue-500 font-bold">--</span></div>
+                                    <div class="pt-2 border-t border-slate-100">Total Error: <span id="val-total-error" class="text-emerald-500 font-bold">--</span></div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 flex flex-col justify-center items-center shadow-sm">
+                                <svg id="tradeoff-svg" class="w-full h-44" viewBox="0 0 300 120"></svg>
+                                <div class="text-xs font-mono text-slate-400 mt-3 text-center">Optimal Complexity sweet spot minimizes Generalization Error.</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (demoKey === 'droneAutopilotLab') {
+                return `
+                    <div class="space-y-8 w-full max-w-5xl mx-auto flex flex-col h-full justify-center">
+                        <div class="space-y-3">
+                            <h2 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900 uppercase">Drone Autopilot Calibration Console</h2>
+                            <h3 class="text-xl md:text-3xl font-bold text-brand-500 font-mono">Simulated Flight Diagnostics Matrix</h3>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                            <div class="space-y-6">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="text-sm font-mono text-slate-500 flex justify-between mb-2">
+                                            <span>Training Data Volume (N)</span>
+                                            <span id="drone-vol-val" class="text-brand-500 font-bold">500</span>
+                                        </label>
+                                        <input type="range" id="slider-drone-vol" min="100" max="5000" step="100" value="500" oninput="updateDroneLab()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-500">
+                                    </div>
+                                    <div>
+                                        <label class="text-sm font-mono text-slate-500 flex justify-between mb-2">
+                                            <span>Noise Filter Factor</span>
+                                            <span id="drone-noise-val" class="text-brand-500 font-bold">0.1</span>
+                                        </label>
+                                        <input type="range" id="slider-drone-noise" min="0" max="1" step="0.1" value="0.1" oninput="updateDroneLab()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-500">
+                                    </div>
+                                    <div>
+                                        <label class="text-sm font-mono text-slate-500 flex justify-between mb-2">
+                                            <span>Model Layer Complexity</span>
+                                            <span id="drone-layer-val" class="text-brand-500 font-bold">8.0</span>
+                                        </label>
+                                        <input type="range" id="slider-drone-layer" min="1" max="10" step="0.5" value="8.0" oninput="updateDroneLab()" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-500">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-8 rounded-xl border border-slate-200 flex flex-col justify-between shadow-sm text-center">
+                                <div class="space-y-4 my-auto">
+                                    <span class="text-xs font-mono font-bold uppercase tracking-widest text-slate-400 block">Autopilot Performance Matrix</span>
+                                    <div id="drone-verdict" class="text-2xl md:text-3xl font-black text-rose-500 flex items-center justify-center gap-3">
+                                        <i class="fa-solid fa-triangle-exclamation"></i> FLIGHT FAILURE (61.2%)
+                                    </div>
+                                    <p class="text-sm text-slate-500 leading-relaxed font-mono">Goal: Achieve 95%+ out-of-sample flight generalization accuracy.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (demoKey === 'practiceCalculators') {
+                return `
+                    <div class="space-y-8 w-full max-w-5xl mx-auto flex flex-col h-full justify-center">
+                        <div class="space-y-3">
+                            <h2 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900 uppercase">Class Evaluation Solvers</h2>
+                            <h3 class="text-xl md:text-3xl font-bold text-brand-500 font-mono">University Question Companion</h3>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 bg-slate-50 p-8 rounded-2xl border border-slate-200 shadow-inner">
+                            <div class="p-6 bg-white rounded-xl border border-slate-200 space-y-5 shadow-sm">
+                                <span class="text-sm font-mono font-bold uppercase tracking-widest text-sky-600 block">Generalization Gap Model Solver</span>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <div>
+                                        <label class="text-xs font-mono text-slate-400 block mb-1">Models (M)</label>
+                                        <input type="number" id="practice-m" value="100" class="w-full p-2.5 bg-slate-50 rounded border border-slate-200 text-sm font-bold font-mono text-slate-800">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-mono text-slate-400 block mb-1">Samples (N)</label>
+                                        <input type="number" id="practice-n" value="5000" class="w-full p-2.5 bg-slate-50 rounded border border-slate-200 text-sm font-bold font-mono text-slate-800">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-mono text-slate-400 block mb-1">Margin (&epsilon;)</label>
+                                        <input type="number" id="practice-eps" value="0.03" step="0.005" class="w-full p-2.5 bg-slate-50 rounded border border-slate-200 text-sm font-bold font-mono text-slate-800">
+                                    </div>
+                                </div>
+                                <button onclick="solvePracticeGap()" class="w-full py-3 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-sm font-bold font-mono transition shadow-sm">Calculate Probability</button>
+                                <div class="bg-slate-50 p-4 rounded border border-slate-200 font-mono text-sm">
+                                    Failure Probability Limit: <span id="practice-result" class="text-sky-600 font-bold text-base">0.0553</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        let selectedDim = 1;
+
+        function initializeDemoLogic(demoKey) {
+            if (demoKey === 'failureSorter') {
+                // Initialize sorting state
+            } else if (demoKey === 'samplingBiasDemo') {
+                updateSamplingBias();
+            } else if (demoKey === 'curseOfDim') {
+                setDimensionSpace(1);
+            } else if (demoKey === 'biasVarianceTradeoff') {
+                updateTradeoffCurves();
+            } else if (demoKey === 'droneAutopilotLab') {
+                updateDroneLab();
+            } else if (demoKey === 'practiceCalculators') {
+                solvePracticeGap();
+            }
+        }
+
+        function sortItem(bucket, el) {
+            const bucketData = document.getElementById('bucket-data');
+            const bucketAlgorithm = document.getElementById('bucket-algorithm');
+
+            if (bucket === 'data') {
+                bucketData.innerHTML = `<div class="p-2 bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold rounded-lg w-full">${el.innerText}</div>`;
+                bucketData.classList.add('border-emerald-500');
+            } else {
+                bucketAlgorithm.innerHTML = `<div class="p-2 bg-blue-50 border border-blue-200 text-blue-800 text-[10px] font-bold rounded-lg w-full">${el.innerText}</div>`;
+                bucketAlgorithm.classList.add('border-blue-500');
+            }
+            el.classList.add('opacity-40', 'pointer-events-none');
+        }
+
+        function updateSamplingBias() {
+            const weight = parseFloat(document.getElementById('slider-bias-weight').value);
+            document.getElementById('bias-weight-val').innerText = `${weight}%`;
+
+            // skewed election simulation
+            const fdrVote = Math.max(10, Math.round(60.8 - (weight * 0.35)));
+            const landonVote = 100 - fdrVote;
+
+            document.getElementById('sample-fdr-val').innerText = `${fdrVote}%`;
+            document.getElementById('sample-landon-val').innerText = `${landonVote}%`;
+
+            const verdict = document.getElementById('sample-bias-verdict');
+            if (landonVote > fdrVote) {
+                verdict.innerText = "🚨 Prediction Error: Landon Wins Sample! (Actual Winner: FDR)";
+                verdict.className = "mt-4 text-xs font-bold font-mono text-rose-500 animate-pulse";
+            } else {
+                verdict.innerText = "✅ Accurate Prediction: FDR Wins Sample.";
+                verdict.className = "mt-4 text-xs font-bold font-mono text-emerald-600";
+            }
+        }
+
+        function setDimensionSpace(dim) {
+            selectedDim = dim;
+            const btn1 = document.getElementById('btn-dim-1');
+            const btn2 = document.getElementById('btn-dim-2');
+            const btn3 = document.getElementById('btn-dim-3');
+
+            btn1.className = "flex-1 py-2 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600";
+            btn2.className = "flex-1 py-2 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600";
+            btn3.className = "flex-1 py-2 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600";
+
+            document.getElementById(`btn-dim-${dim}`).className = "flex-1 py-2 rounded-lg text-xs font-bold border border-orange-200 bg-orange-50 text-brand-500";
+
+            const factorEl = document.getElementById('sparsity-factor-val');
+            const descEl = document.getElementById('sparsity-desc-val');
+
+            if (dim === 1) {
+                factorEl.innerText = "12.5% Sparsity";
+                descEl.innerText = "Data points cluster densely on a single dimension. Generalization constraints are stable.";
+            } else if (dim === 2) {
+                factorEl.innerText = "55.0% Sparsity";
+                descEl.innerText = "Data coordinates disperse across a 2-D plane. Spatial density begins to decay.";
+            } else {
+                factorEl.innerText = "92.4% Sparsity";
+                descEl.innerText = "Catastrophic Sparsity! Data points become completely isolated in 3-D volume, causing overfitting.";
+            }
+        }
+
+        function updateTradeoffCurves() {
+            const complexity = parseFloat(document.getElementById('slider-complexity').value);
+            document.getElementById('complexity-val').innerText = complexity.toFixed(1);
+
+            const bias = Math.pow(10 - complexity, 2) / 10 + 1;
+            const variance = Math.pow(complexity, 2) / 10 + 0.5;
+            const totalError = bias + variance;
+
+            document.getElementById('val-bias').innerText = bias.toFixed(2);
+            document.getElementById('val-variance').innerText = variance.toFixed(2);
+            document.getElementById('val-total-error').innerText = totalError.toFixed(2);
+
+            const svg = document.getElementById('tradeoff-svg');
+            if (!svg) return;
+
+            let pathBias = "M 20 100 ";
+            let pathVar = "M 20 100 ";
+            let pathTot = "M 20 100 ";
+
+            for (let i = 0; i <= 20; i++) {
+                const xVal = 1 + (i / 20) * 9;
+                const tempBias = Math.pow(10 - xVal, 2) / 10 + 1;
+                const tempVar = Math.pow(xVal, 2) / 10 + 0.5;
+                const tempTot = tempBias + tempVar;
+
+                const screenX = 20 + (i / 20) * 260;
+                const screenBiasY = 110 - (tempBias / 12) * 80;
+                const screenVarY = 110 - (tempVar / 12) * 80;
+                const screenTotY = 110 - (tempTot / 12) * 80;
+
+                pathBias += `L ${screenX} ${screenBiasY} `;
+                pathVar += `L ${screenX} ${screenVarY} `;
+                pathTot += `L ${screenX} ${screenTotY} `;
+            }
+
+            const currentX = 20 + ((complexity - 1) / 9) * 260;
+            const currentY = 110 - (totalError / 12) * 80;
+
+            svg.innerHTML = `
+                <line x1="20" y1="110" x2="280" y2="110" stroke="#cbd5e1" stroke-width="2" />
+                <line x1="20" y1="10" x2="20" y2="110" stroke="#cbd5e1" stroke-width="2" />
+                
+                <path d="${pathBias}" fill="none" stroke="#ef4444" stroke-width="2" opacity="0.6"/>
+                <path d="${pathVar}" fill="none" stroke="#3b82f6" stroke-width="2" opacity="0.6"/>
+                <path d="${pathTot}" fill="none" stroke="#10b981" stroke-width="3" />
+                
+                <circle cx="${currentX}" cy="${currentY}" r="5" fill="#1e3a8a" class="pulse-element" />
+                <text x="280" y="118" fill="#475569" font-size="7" font-family="monospace" text-anchor="end">Complexity</text>
+                <text x="15" y="15" fill="#475569" font-size="7" font-family="monospace">Error Rate</text>
+            `;
+        }
+
+        function updateDroneLab() {
+            const vol = parseFloat(document.getElementById('slider-drone-vol').value);
+            const noise = parseFloat(document.getElementById('slider-drone-noise').value);
+            const complexity = parseFloat(document.getElementById('slider-drone-layer').value);
+
+            document.getElementById('drone-vol-val').innerText = vol;
+            document.getElementById('drone-noise-val').innerText = noise.toFixed(1);
+            document.getElementById('drone-layer-val').innerText = complexity.toFixed(1);
+
+            // simulated score calculation
+            const score = Math.max(40, Math.min(99, Math.round(
+                40 + (vol / 5000) * 30 + (1 - noise) * 20 - Math.abs(complexity - 4) * 5
+            )));
+
+            const verdict = document.getElementById('drone-verdict');
+            if (score >= 90) {
+                verdict.className = "text-2xl font-black text-emerald-600 flex items-center justify-center gap-2 animate-pulse";
+                verdict.innerHTML = `<i class="fa-solid fa-circle-check"></i> AUTOPILOT SECURED (${score}%)`;
+            } else {
+                verdict.className = "text-2xl font-black text-rose-500 flex items-center justify-center gap-2";
+                verdict.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> FLIGHT FAILURE (${score}%)`;
+            }
+        }
+
+        function solvePracticeGap() {
+            const m = parseFloat(document.getElementById('practice-m').value);
+            const n = parseFloat(document.getElementById('practice-n').value);
+            const eps = parseFloat(document.getElementById('practice-eps').value);
+
+            const prob = 2 * m * Math.exp(-2 * eps * eps * n);
+            document.getElementById('practice-result').innerText = prob.toFixed(5);
+        }
+
+        function initViewportZoomSupport() {
+            const frame = document.getElementById('viewport-content-frame');
+            if (!frame) return;
+
+            frame.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const zoomIntensity = 0.08;
+                if (e.deltaY < 0) {
+                    adjustZoom(zoomIntensity);
+                } else {
+                    adjustZoom(-zoomIntensity);
+                }
+            }, { passive: false });
+
+            // Pinch to zoom touch configurations
+            let touchStartDist = 0;
+            frame.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    touchStartDist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                }
+            }, { passive: true });
+
+            frame.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2 && touchStartDist > 0) {
+                    const currentDist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    const diff = currentDist - touchStartDist;
+                    const scaleFactor = diff * 0.005;
+                    adjustZoom(scaleFactor);
+                    touchStartDist = currentDist;
+                }
+            }, { passive: true });
+
+            frame.addEventListener('touchend', () => {
+                touchStartDist = 0;
+            });
+        }
+
+        function initWhiteboard() {
+            whiteboardCanvas = document.getElementById('whiteboard-canvas');
+            if (!whiteboardCanvas) return;
+            whiteboardCtx = whiteboardCanvas.getContext('2d');
+
+            window.addEventListener('resize', resizeWhiteboardCanvas);
+            resizeWhiteboardCanvas();
+
+            const viewportFrame = document.getElementById('viewport-content-frame');
+
+            // Mouse/Touch Drawing bindings with scaled coordinates mapping
+            viewportFrame.addEventListener('mousedown', startDrawing);
+            viewportFrame.addEventListener('mousemove', drawLine);
+            viewportFrame.addEventListener('mouseup', stopDrawing);
+            viewportFrame.addEventListener('mouseleave', stopDrawing);
+
+            viewportFrame.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) startDrawing(e.touches[0]);
+            });
+            viewportFrame.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 1) drawLine(e.touches[0]);
+            });
+            viewportFrame.addEventListener('touchend', stopDrawing);
+        }
+
+        function resizeWhiteboardCanvas() {
+            if (!whiteboardCanvas) return;
+            const rect = whiteboardCanvas.parentElement.getBoundingClientRect();
+            whiteboardCanvas.width = rect.width;
+            whiteboardCanvas.height = rect.height;
+        }
+
+        function toggleWhiteboard() {
+            whiteboardActive = !whiteboardActive;
+            const canvas = document.getElementById('whiteboard-canvas');
+            const btn = document.getElementById('btn-whiteboard');
+            const palette = document.getElementById('presentation-tools-palette');
+
+            if (whiteboardActive) {
+                canvas.classList.remove('pointer-events-none');
+                canvas.classList.add('cursor-crosshair');
+                btn.className = "px-4 py-2 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-xl text-sm font-semibold text-brand-500 transition duration-150 flex items-center gap-2 shadow-inner";
+                palette.classList.remove('hidden');
+
+                if (laserPointerActive) toggleLaserPointer();
+                if (panModeActive) togglePanMode();
+            } else {
+                canvas.classList.add('pointer-events-none');
+                canvas.classList.remove('cursor-crosshair');
+                btn.className = "px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition duration-150 flex items-center gap-2";
+                palette.classList.add('hidden');
+            }
+        }
+
+        function setWhiteboardColor(color) {
+            whiteboardColor = color;
+        }
+
+        function clearWhiteboard() {
+            if (whiteboardCtx && whiteboardCanvas) {
+                whiteboardCtx.clearRect(0, 0, whiteboardCanvas.width, whiteboardCanvas.height);
+            }
+        }
+
+        function startDrawing(e) {
+            if (!whiteboardActive || panModeActive) return;
+            whiteboardDrawing = true;
+
+            const rect = whiteboardCanvas.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+            const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+
+            const x = (clientX - rect.left) * (whiteboardCanvas.width / rect.width);
+            const y = (clientY - rect.top) * (whiteboardCanvas.height / rect.height);
+
+            whiteboardCtx.beginPath();
+            whiteboardCtx.moveTo(x, y);
+        }
+
+        function drawLine(e) {
+            if (!whiteboardActive || !whiteboardDrawing || panModeActive) return;
+
+            const rect = whiteboardCanvas.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+            const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+
+            const x = (clientX - rect.left) * (whiteboardCanvas.width / rect.width);
+            const y = (clientY - rect.top) * (whiteboardCanvas.height / rect.height);
+
+            whiteboardCtx.strokeStyle = whiteboardColor;
+            whiteboardCtx.lineWidth = 3;
+            whiteboardCtx.lineCap = 'round';
+            whiteboardCtx.lineTo(x, y);
+            whiteboardCtx.stroke();
+        }
+
+        function stopDrawing() {
+            whiteboardDrawing = false;
+        }
+
+        function initLaserPointer() {
+            const viewport = document.getElementById('viewport-content-frame');
+            const laser = document.getElementById('laser-pointer');
+            if (!viewport || !laser) return;
+
+            viewport.addEventListener('mousemove', (e) => {
+                if (!laserPointerActive) return;
+                const rect = viewport.getBoundingClientRect();
+
+                const x = (e.clientX - rect.left);
+                const y = (e.clientY - rect.top);
+
+                laser.style.left = `${x}px`;
+                laser.style.top = `${y}px`;
+            });
+
+            viewport.addEventListener('mouseleave', () => {
+                if (laserPointerActive) laser.classList.add('hidden');
+            });
+
+            viewport.addEventListener('mouseenter', () => {
+                if (laserPointerActive) laser.classList.remove('hidden');
+            });
+        }
+
+        function toggleLaserPointer() {
+            laserPointerActive = !laserPointerActive;
+            const laser = document.getElementById('laser-pointer');
+            const btn = document.getElementById('btn-laser');
+
+            if (laserPointerActive) {
+                laser.classList.remove('hidden');
+                btn.className = "px-4 py-2 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-xl text-sm font-semibold text-brand-500 transition duration-150 flex items-center gap-2 shadow-inner";
+
+                if (whiteboardActive) toggleWhiteboard();
+                if (panModeActive) togglePanMode();
+            } else {
+                laser.classList.add('hidden');
+                btn.className = "px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 transition duration-150 flex items-center gap-2";
+            }
+        }
+
+        function initViewportPan() {
+            const frame = document.getElementById('viewport-content-frame');
+            if (!frame) return;
+
+            frame.addEventListener('mousedown', (e) => {
+                if (panModeActive || e.shiftKey || e.button === 1) {
+                    isPanning = true;
+                    startPanCoords = { x: e.clientX - panOffset.x, y: e.clientY - panOffset.y };
+                    frame.style.cursor = 'grabbing';
+                    e.preventDefault();
+                }
+            });
+
+            frame.addEventListener('mousemove', (e) => {
+                if (isPanning) {
+                    panOffset.x = e.clientX - startPanCoords.x;
+                    panOffset.y = e.clientY - startPanCoords.y;
+                    applyZoomTransform();
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (isPanning) {
+                    isPanning = false;
+                    if (frame) frame.style.cursor = '';
+                }
+            });
+
+            // Touch bindings
+            frame.addEventListener('touchstart', (e) => {
+                if ((panModeActive || e.touches.length > 1) && e.touches.length === 1) {
+                    isPanning = true;
+                    startPanCoords = { x: e.touches[0].clientX - panOffset.x, y: e.touches[0].clientY - panOffset.y };
+                }
+            });
+
+            frame.addEventListener('touchmove', (e) => {
+                if (isPanning && e.touches.length === 1) {
+                    panOffset.x = e.touches[0].clientX - startPanCoords.x;
+                    panOffset.y = e.touches[0].clientY - startPanCoords.y;
+                    applyZoomTransform();
+                }
+            });
+
+            frame.addEventListener('touchend', () => {
+                isPanning = false;
+            });
+        }
+
+        let sandboxPoints = [];
+        let sandboxModelType = 'overfit';
+
+        function initSandboxPlotter() {
+            const canvas = document.getElementById('sandbox-plot-canvas');
+            if (!canvas) return;
+
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            canvas.addEventListener('mousedown', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                // Left click adds blue dots, right click adds red dots
+                const label = e.button === 0 ? 1 : -1;
+                sandboxPoints.push({ x, y, label });
+                drawSandboxPlot();
+            });
+
+            canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+            drawSandboxPlot();
+        }
+
+        function setSandboxModel(modelType) {
+            sandboxModelType = modelType;
+
+            document.getElementById('btn-sb-linear').className = "flex-1 py-2 rounded-lg text-xs font-bold border border-slate-300 bg-white text-slate-700 shadow-sm";
+            document.getElementById('btn-sb-quad').className = "flex-1 py-2 rounded-lg text-xs font-bold border border-slate-300 bg-white text-slate-700 shadow-sm";
+            document.getElementById('btn-sb-overfit').className = "flex-1 py-2 rounded-lg text-xs font-bold border border-orange-200 bg-orange-50 text-brand-500 shadow-sm";
+
+            if (modelType === 'linear') {
+                document.getElementById('btn-sb-linear').className = "flex-1 py-2 rounded-lg text-xs font-bold border border-orange-200 bg-orange-50 text-brand-500 shadow-sm";
+            } else if (modelType === 'quadratic') {
+                document.getElementById('btn-sb-quad').className = "flex-1 py-2 rounded-lg text-xs font-bold border border-orange-200 bg-orange-50 text-brand-500 shadow-sm";
+            } else if (modelType === 'overfit') {
+                document.getElementById('btn-sb-overfit').className = "flex-1 py-2 rounded-lg text-xs font-bold border border-orange-200 bg-orange-50 text-brand-500 shadow-sm";
+            }
+
+            drawSandboxPlot();
+        }
+
+        function clearSandboxPoints() {
+            sandboxPoints = [];
+            drawSandboxPlot();
+        }
+
+        function drawSandboxPlot() {
+            const canvas = document.getElementById('sandbox-plot-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+
+            if (sandboxPoints.length > 1) {
+                // draw fit lines based on model selection
+                ctx.lineWidth = 3;
+                if (sandboxModelType === 'linear') {
+                    ctx.strokeStyle = '#1e3a8a';
+                    ctx.beginPath();
+                    ctx.moveTo(0, h * 0.75);
+                    ctx.lineTo(w, h * 0.25);
+                    ctx.stroke();
+                } else if (sandboxModelType === 'quadratic') {
+                    ctx.strokeStyle = '#059669';
+                    ctx.beginPath();
+                    for (let x = 0; x < w; x++) {
+                        const normalizedX = (x / w) - 0.5;
+                        const y = h * 0.6 - (normalizedX * normalizedX * h * 1.2);
+                        if (x === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                } else {
+                    ctx.strokeStyle = '#ea580c';
+                    ctx.beginPath();
+                    for (let x = 0; x < w; x++) {
+                        const y = h * 0.5 + Math.sin(x * 0.04) * 50 + Math.cos(x * 0.015) * 30;
+                        if (x === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                }
+            }
+
+            // Draw points
+            sandboxPoints.forEach(pt => {
+                ctx.fillStyle = pt.label === 1 ? '#059669' : '#ef4444';
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            });
+        }
+
+        function updateBoundPlot() {
+            const n = parseFloat(document.getElementById('sb-slider-n').value);
+            const eps = parseFloat(document.getElementById('sb-slider-eps').value);
+            const m = parseFloat(document.getElementById('sb-slider-m').value);
+
+            document.getElementById('sb-slider-n-val').innerText = n;
+            document.getElementById('sb-slider-eps-val').innerText = eps.toFixed(2);
+            document.getElementById('sb-slider-m-val').innerText = m;
+
+            const exponent = -2 * (eps * eps) * n;
+            const boundVal = 2 * m * Math.exp(exponent);
+
+            document.getElementById('sb-calculated-prob').innerText = boundVal > 1 ? "1.000000" : boundVal.toFixed(6);
+
+            const svg = document.getElementById('bound-curve-svg');
+            if (!svg) return;
+
+            let pathD = "M 20 100 ";
+            for (let i = 0; i <= 20; i++) {
+                const sampleScale = (i / 20) * 10000;
+                const tempExp = -2 * (eps * eps) * sampleScale;
+                const tempBound = 2 * m * Math.exp(tempExp);
+                const screenY = 100 - (Math.min(tempBound, 2) / 2) * 80;
+                const screenX = 20 + (i / 20) * 260;
+                pathD += `L ${screenX} ${screenY} `;
+            }
+
+            const currentExp = -2 * (eps * eps) * n;
+            const currentBoundValue = 2 * m * Math.exp(currentExp);
+            const targetX = 20 + (n / 10000) * 260;
+            const targetY = 100 - (Math.min(currentBoundValue, 2) / 2) * 80;
+
+            svg.innerHTML = `
+                <line x1="20" y1="100" x2="280" y2="100" stroke="#cbd5e1" stroke-width="2" />
+                <line x1="20" y1="20" x2="20" y2="100" stroke="#cbd5e1" stroke-width="2" />
+                <path d="${pathD}" fill="none" stroke="#ea580c" stroke-width="3" />
+                <circle cx="${targetX}" cy="${targetY}" r="5" fill="#1e3a8a" class="pulse-element" />
+                <text x="280" y="115" fill="#475569" font-size="8" font-family="monospace" text-anchor="end">N Samples</text>
+                <text x="15" y="15" fill="#475569" font-size="8" font-family="monospace">Probability Bound</text>
+            `;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const activeTag = document.activeElement.tagName.toLowerCase();
+            if (activeTag === 'input' || activeTag === 'textarea') return;
+
+            switch (e.key) {
+                case 'ArrowRight':
+                case ' ':
+                    e.preventDefault();
+                    nextSlide();
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    prevSlide();
+                    break;
+                case 'f':
+                case 'F':
+                    e.preventDefault();
+                    toggleFullscreen();
+                    break;
+                case 'o':
+                case 'O':
+                    e.preventDefault();
+                    toggleSidebar();
+                    break;
+                case 'n':
+                case 'N':
+                    e.preventDefault();
+                    toggleNotesSidebar();
+                    break;
+                case 'w':
+                case 'W':
+                    e.preventDefault();
+                    toggleWhitepaperMode();
+                    break;
+                case 'm':
+                case 'M':
+                    e.preventDefault();
+                    toggleMode(lectureMode === 'student' ? 'teacher' : 'student');
+                    break;
+                case 'Escape':
+                    const modal = document.getElementById('help-modal');
+                    if (!modal.classList.contains('hidden')) modal.classList.add('hidden');
+                    break;
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            const icon = document.getElementById('fullscreen-icon');
+            if (document.fullscreenElement) {
+                icon.className = "fa-solid fa-compress";
+            } else {
+                if (!isPseudoFullscreen) {
+                    icon.className = "fa-solid fa-expand";
+                }
+            }
+            setTimeout(resizeWhiteboardCanvas, 150);
+        });
+
+        window.onload = function () {
+            initSidebarOutline();
+            renderCurrentSlide();
+            initWhiteboard();
+            initLaserPointer();
+            initViewportPan();
+            initViewportZoomSupport();
+
+            // Sidebar simulation engines
+            initSandboxPlotter();
+            updateBoundPlot();
+        }
+    </script>
+</body>
+
+</html>

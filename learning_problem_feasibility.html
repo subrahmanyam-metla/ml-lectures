@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduction to Statistical Learning</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font & Fira Code -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            500: '#0284c7',  /* Premium Sky Blue Primary Accent */
+                            600: '#0f172a',  /* Sophisticated Slate Dark */
+                            700: '#0369a1',  
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(15, 23, 42, 0.1);
+            border-radius: 6px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(2, 132, 199, 0.3);
+        }
+        .slide-enter {
+            opacity: 0;
+            transform: scale(0.98) translateY(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .slide-active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.96); opacity: 0.6; }
+            50% { transform: scale(1.06); opacity: 0.9; }
+            100% { transform: scale(0.96); opacity: 0.6; }
+        }
+        .pulse-element {
+            animation: pulse-ring 3s infinite ease-in-out;
+        }
+
+        /* Fullscreen Hidden Elements (Disappears automatically when in fullscreen mode) */
+        :fullscreen #outline-sidebar,
+        :-webkit-full-screen #outline-sidebar,
+        :fullscreen #notes-sidebar,
+        :-webkit-full-screen #notes-sidebar,
+        :fullscreen #header-controls,
+        :-webkit-full-screen #header-controls,
+        :fullscreen #footer-controls,
+        :-webkit-full-screen #footer-controls {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+            border: none !important;
+            margin: 0 !important;
+        }
+
+        :fullscreen #slide-viewport,
+        :-webkit-full-screen #slide-viewport {
+            max-width: 100vw !important;
+            max-height: calc(100vh - 120px) !important; /* Reserve spacing for header/footer inside fullscreen */
+            width: 100% !important;
+            height: 100% !important;
+            border: none !important;
+            border-radius: 0px !important;
+            background-color: #ffffff !important;
+        }
+    </style>
+</head>
+<body class="h-full bg-slate-50 text-slate-800 font-sans overflow-hidden">
+
+    <div class="h-full flex flex-col">
+        <!-- Control Header -->
+        <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap justify-between items-center gap-4 z-10 shrink-0 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-brand-500 flex items-center justify-center text-white font-black text-xl shadow-md">
+                    SL
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-black tracking-tight text-slate-900 flex items-center gap-2">
+                        Introduction to Statistical Learning
+                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-sky-100 text-sky-700 border border-sky-200 tracking-wider">UNIT 1</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 font-medium">Core Theoretical Frameworks & Interactive Proofs</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 flex-wrap">
+                <!-- Modes and Shortcut Controls (Disappears in Fullscreen) -->
+                <div id="header-controls" class="flex items-center gap-3 flex-wrap">
+                    <!-- Modes Toggle -->
+                    <div class="bg-slate-100 rounded-xl p-1 border border-slate-200 flex items-center gap-1 shadow-inner">
+                        <button id="btn-student-mode" onclick="toggleMode('student')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition duration-150 flex items-center gap-1.5 text-slate-600 hover:text-slate-950">
+                            <i class="fa-solid fa-graduation-cap"></i> Student Study
+                        </button>
+                        <button id="btn-teacher-mode" onclick="toggleMode('teacher')" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition duration-150 flex items-center gap-1.5 text-slate-600 hover:text-slate-950">
+                            <i class="fa-solid fa-chalkboard-user"></i> Lecture Slides
+                        </button>
+                    </div>
+
+                    <!-- Shortcuts Help -->
+                    <button onclick="toggleHelpModal()" class="px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 transition duration-150 flex items-center gap-1.5">
+                        <i class="fa-regular fa-keyboard"></i> Hotkeys
+                    </button>
+                </div>
+
+                <!-- Fullscreen Button -->
+                <button onclick="toggleFullscreen()" class="p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-slate-700 transition duration-150" title="Toggle Fullscreen (F)">
+                    <i id="fullscreen-icon" class="fa-solid fa-expand"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 flex overflow-hidden relative">
+            
+            <!-- Left Outline Sidebar -->
+            <aside id="outline-sidebar" class="w-72 bg-slate-100 border-r border-slate-200 flex flex-col transition-all duration-300 shrink-0">
+                <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-white">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Deck Index</span>
+                    <span class="text-xs bg-slate-200 px-2 py-0.5 rounded border border-slate-300 font-mono font-bold text-slate-700" id="slide-ratio-counter">Slide 1 / 12</span>
+                </div>
+                <div class="flex-1 overflow-y-auto p-2 space-y-1" id="outline-list">
+                    <!-- Injected via JavaScript dynamically -->
+                </div>
+            </aside>
+
+            <!-- Center Stage Slide Viewport -->
+            <div class="flex-1 flex flex-col bg-slate-50 overflow-hidden relative">
+                <!-- Outer slide frame mimicking projection screen -->
+                <div class="flex-1 flex items-center justify-center p-4 lg:p-8 overflow-hidden">
+                    <div id="slide-viewport" class="group/viewport w-full max-w-6xl bg-white border border-slate-200 rounded-xl shadow-lg flex flex-col min-h-[580px] max-h-[82vh] transition-all relative overflow-hidden">
+                        
+                        <!-- Zoom, Pan, Reset Coordinates overlay -->
+                        <div id="zoom-controls-panel" class="absolute top-4 left-4 z-40 bg-white/95 border border-slate-200 p-1.5 rounded-lg flex items-center gap-1.5 shadow-sm opacity-0 pointer-events-none group-hover/viewport:opacity-100 group-hover/viewport:pointer-events-auto focus-within:opacity-100 focus-within:pointer-events-auto transition-all duration-300">
+                            <span class="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest pl-1">Scaling:</span>
+                            <button onclick="adjustZoom(0.1)" class="w-6 h-6 rounded bg-slate-50 hover:bg-slate-100 text-slate-700 flex items-center justify-center text-xs font-bold transition" title="Zoom In">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <span id="zoom-factor-indicator" class="text-xs font-mono font-bold text-brand-500 min-w-[32px] text-center">100%</span>
+                            <button onclick="adjustZoom(-0.1)" class="w-6 h-6 rounded bg-slate-50 hover:bg-slate-100 text-slate-700 flex items-center justify-center text-xs font-bold transition" title="Zoom Out">
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+                            <button onclick="resetZoom()" class="w-6 h-6 rounded bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 flex items-center justify-center text-[10px] transition" title="Reset Slide View">
+                                <i class="fa-solid fa-arrows-to-dot"></i>
+                            </button>
+                            <div class="w-px h-4 bg-slate-200"></div>
+                            <button id="btn-pan-mode" onclick="togglePanMode()" class="w-6 h-6 rounded bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] transition" title="Hold Space / Drag to pan">
+                                <i class="fa-solid fa-hand"></i>
+                            </button>
+                        </div>
+
+                        <!-- Zoomable Wrapper frame -->
+                        <div class="flex-1 relative overflow-hidden bg-white" id="viewport-content-frame">
+                            <div id="zoom-content-wrapper" class="w-full h-full absolute inset-0 origin-center transition-transform duration-100 ease-out flex flex-col justify-center">
+                                
+                                <!-- Blackboard overlay canvas -->
+                                <canvas id="whiteboard-canvas" class="absolute inset-0 z-20 pointer-events-none bg-transparent"></canvas>
+                                
+                                <!-- Pure whitepaper overlay for empty drawpad -->
+                                <div id="whitepaper-overlay" class="absolute inset-0 bg-white z-10 hidden flex flex-col items-center justify-center pointer-events-none select-none">
+                                    <div class="text-center space-y-3 max-w-sm px-4">
+                                        <div class="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mx-auto shadow-sm text-brand-500">
+                                            <i class="fa-solid fa-chalkboard text-2xl"></i>
+                                        </div>
+                                        <h3 class="text-lg font-bold text-slate-800 uppercase tracking-wide font-mono">Scratch Whiteboard</h3>
+                                        <p class="text-xs text-slate-500 leading-relaxed">A clean slate for lecture diagrams. Toggle the "Draw" button below to pick colors and sketch formulas.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Laser pointer tool -->
+                                <div id="laser-pointer" class="absolute w-6 h-6 rounded-full bg-red-600/90 shadow-[0_0_15px_4px_#dc2626] pointer-events-none z-30 hidden -translate-x-1/2 -translate-y-1/2"></div>
+
+                                <!-- Dynamic slide container -->
+                                <div class="flex-1 p-6 md:p-10 overflow-y-auto flex flex-col justify-center" id="slide-stage">
+                                    <!-- Injected via javascript -->
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Blackboard Drawing Tool Overlay -->
+                        <div id="presentation-tools-palette" class="absolute bottom-4 right-4 bg-white/95 border border-slate-200 px-3 py-1.5 rounded-lg flex items-center gap-2.5 z-40 shadow-sm hidden">
+                            <span class="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">Pen Color:</span>
+                            <button onclick="setWhiteboardColor('#ef4444')" class="w-4 h-4 rounded-full bg-red-500 border-2 border-white shadow-sm hover:scale-110 transition" title="Red"></button>
+                            <button onclick="setWhiteboardColor('#0284c7')" class="w-4 h-4 rounded-full bg-sky-500 border-2 border-white shadow-sm hover:scale-110 transition" title="Sky Blue"></button>
+                            <button onclick="setWhiteboardColor('#10b981')" class="w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow-sm hover:scale-110 transition" title="Green"></button>
+                            <button onclick="setWhiteboardColor('#0f172a')" class="w-4 h-4 rounded-full bg-slate-900 border-2 border-white shadow-sm hover:scale-110 transition" title="Slate Black"></button>
+                            <div class="w-px h-4 bg-slate-200"></div>
+                            <button onclick="clearWhiteboard()" class="px-2 py-1 bg-slate-50 hover:bg-slate-100 text-red-600 rounded text-[10px] font-bold border border-slate-200 flex items-center gap-1">
+                                <i class="fa-solid fa-eraser"></i> Clear Canvas
+                            </button>
+                        </div>
+
+                        <!-- Top metadata bar -->
+                        <div class="px-6 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50/70">
+                            <div class="flex items-center gap-2 text-xs font-bold text-brand-500 tracking-wider uppercase">
+                                <span class="w-2 h-2 rounded-full bg-brand-500 inline-block animate-ping"></span>
+                                <span id="slide-category">Paradox & Context</span>
+                            </div>
+                            <div class="text-xs text-slate-500 font-mono font-bold" id="slide-index-indicator">SLIDE 01 OF 12</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Footer Navigation controls -->
+                <footer id="footer-controls" class="bg-white border-t border-slate-200 px-6 py-4 flex justify-between items-center gap-4 shrink-0 shadow-sm">
+                    <div class="flex items-center gap-2">
+                        <button onclick="prevSlide()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-sm text-slate-800 transition font-bold flex items-center gap-1.5 disabled:opacity-35 disabled:cursor-not-allowed" id="btn-prev">
+                            <i class="fa-solid fa-arrow-left"></i> Previous
+                        </button>
+                        <button onclick="nextSlide()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-950 rounded-lg text-sm text-white transition font-bold flex items-center gap-1.5 disabled:opacity-35 disabled:cursor-not-allowed" id="btn-next">
+                            Next <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Slide Progress Slider bar -->
+                    <div class="flex-1 max-w-md hidden md:flex items-center gap-3">
+                        <span class="text-xs text-slate-400 font-mono font-bold">01</span>
+                        <input type="range" id="slide-progress" min="0" max="11" value="0" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-500" oninput="jumpToSlide(parseInt(this.value))">
+                        <span class="text-xs text-slate-400 font-mono font-bold">12</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <!-- Whitepaper Toggle -->
+                        <button id="btn-whitepaper-toggle" onclick="toggleWhitepaperMode()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition flex items-center gap-1.5" title="Toggle blank blackboard overlay">
+                            <i class="fa-solid fa-chalkboard text-emerald-600"></i> Blackboard
+                        </button>
+
+                        <!-- Laser Pointer Toggle -->
+                        <button id="btn-laser" onclick="toggleLaserPointer()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition flex items-center gap-1.5" title="Toggle Pointer Projection">
+                            <i class="fa-solid fa-circle text-red-500 text-[10px]"></i> Laser
+                        </button>
+
+                        <!-- Whiteboard Pen Toggle -->
+                        <button id="btn-whiteboard" onclick="toggleWhiteboard()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition flex items-center gap-1.5" title="Toggle Drawing Layer">
+                            <i class="fa-solid fa-pen text-sky-600"></i> Draw
+                        </button>
+                        
+                        <!-- Toggle Sidebar Outline -->
+                        <button onclick="toggleSidebar()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-bars"></i> Deck Index
+                        </button>
+
+                        <!-- Toggle Presenter Notes Sidebar -->
+                        <button id="btn-toggle-notes" onclick="toggleNotesSidebar()" class="px-3 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg text-xs font-semibold text-brand-500 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-graduation-cap"></i> Notes Tab
+                        </button>
+                    </div>
+                </footer>
+
+                <!-- Symmetrical Academic Sub-Footer -->
+                <div class="bg-slate-200 border-t border-slate-300 px-6 py-2.5 flex justify-between items-center text-xs text-slate-600 font-semibold tracking-wide select-none">
+                    <div id="academic-footer-date" class="w-1/4 text-left font-mono">Sunday, July 19, 2026</div>
+                    <div id="academic-footer-topic" class="w-2/5 text-center truncate font-bold text-slate-800 uppercase tracking-wider">Introduction to Statistical Learning</div>
+                    <div class="w-1/4 text-right font-mono text-slate-500" id="academic-footer-page">Slide 1 / 12</div>
+                </div>
+            </div>
+
+            <!-- Notes / Simulator Sidebar -->
+            <aside id="notes-sidebar" class="w-96 bg-white border-l border-slate-200 flex flex-col transition-all duration-300 shrink-0 shadow-md">
+                <div class="p-1 border-b border-slate-200 flex bg-slate-50">
+                    <button id="tab-notes" onclick="setActiveTab('notes')" class="flex-1 py-2 text-center text-xs font-bold rounded transition-all bg-white text-brand-600 border border-slate-200 shadow-sm">
+                        <i class="fa-regular fa-comment-dots mr-1 text-brand-500"></i> Lecture Guides
+                    </button>
+                    <button id="tab-sandbox" onclick="setActiveTab('sandbox')" class="flex-1 py-2 text-center text-xs font-bold rounded transition-all text-slate-500 hover:text-slate-850">
+                        <i class="fa-solid fa-flask mr-1 text-brand-500"></i> Math Labs
+                    </button>
+                </div>
+
+                <!-- Tab contents -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                    
+                    <!-- LECTURE NOTES PANEL -->
+                    <div id="notes-content" class="space-y-4">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                            <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-brand-500">Active Speaker Guideline</span>
+                            <p id="speaker-note-text" class="text-xs leading-relaxed text-slate-700">Loading guide...</p>
+                        </div>
+                        
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                            <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-emerald-600">Real-World Reference Case</span>
+                            <p id="slide-example-text" class="text-xs leading-relaxed text-slate-700">Loading cases...</p>
+                        </div>
+
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                            <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-sky-600">In-Class Checkup Prompt</span>
+                            <p id="slide-interaction-text" class="text-xs leading-relaxed text-slate-700">Loading interactive check...</p>
+                        </div>
+                    </div>
+
+                    <!-- SANDBOX SIMULATOR PANEL -->
+                    <div id="sandbox-content" class="hidden space-y-4">
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                            <span class="text-xs font-mono font-bold uppercase tracking-widest text-brand-500 block">Generalization Simulator</span>
+                            <p class="text-[11px] text-slate-500 leading-relaxed">Plot points on the 2D grid. Select model complexity on the buttons below to observe how complex boundaries reduce Training Error but increase Generalization Error risk.</p>
+                            
+                            <!-- Sandbox decision boundaries -->
+                            <div class="relative w-full aspect-square bg-white rounded-lg border border-slate-200 overflow-hidden shadow-inner">
+                                <canvas id="sandbox-plot-canvas" class="w-full h-full cursor-crosshair bg-white"></canvas>
+                            </div>
+
+                            <div class="flex gap-1.5">
+                                <button onclick="setSandboxModel('linear')" id="btn-sb-linear" class="flex-1 py-1.5 rounded text-[10px] font-bold border border-slate-300 bg-white text-slate-700 shadow-sm">Linear (Low Var)</button>
+                                <button onclick="setSandboxModel('quadratic')" id="btn-sb-quad" class="flex-1 py-1.5 rounded text-[10px] font-bold border border-slate-300 bg-white text-slate-700 shadow-sm">Quadratic</button>
+                                <button onclick="setSandboxModel('overfit')" id="btn-sb-overfit" class="flex-1 py-1.5 rounded text-[10px] font-bold border border-sky-200 bg-sky-50 text-sky-700 shadow-sm">Overfit Spline</button>
+                            </div>
+
+                            <div class="flex gap-1.5">
+                                <button onclick="clearSandboxPoints()" class="flex-1 py-1.5 text-[10px] font-bold bg-white hover:bg-red-50 rounded text-red-600 border border-slate-200 transition shadow-sm">Reset Plot Nodes</button>
+                            </div>
+                        </div>
+
+                        <!-- PAC Sample Complexity Calculator Widget -->
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                            <span class="text-xs font-mono font-bold uppercase tracking-widest text-sky-600 block">PAC Complexity Plotter</span>
+                            <p class="text-[11px] text-slate-500 leading-relaxed">Adjust parameters to see how sample sizes ($m$) expand as error limits ($\epsilon$) shrink under target failure probabilities ($\delta$).</p>
+                            
+                            <div class="space-y-2">
+                                <div>
+                                    <label class="text-[10px] font-mono text-slate-500 flex justify-between">
+                                        <span>Accuracy error limit (&epsilon;)</span>
+                                        <span id="sb-slider-eps-val" class="text-brand-500 font-bold">0.05</span>
+                                    </label>
+                                    <input type="range" id="sb-slider-eps" min="0.01" max="0.2" step="0.01" value="0.05" oninput="updateBoundPlot()" class="w-full h-1 bg-slate-200 rounded accent-brand-500">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-mono text-slate-500 flex justify-between">
+                                        <span>Confidence Failure rate (&delta;)</span>
+                                        <span id="sb-slider-delta-val" class="text-brand-500 font-bold">0.05</span>
+                                    </label>
+                                    <input type="range" id="sb-slider-delta" min="0.01" max="0.2" step="0.01" value="0.05" oninput="updateBoundPlot()" class="w-full h-1 bg-slate-200 rounded accent-brand-500">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-mono text-slate-500 flex justify-between">
+                                        <span>Hypothesis Space |H|</span>
+                                        <span id="sb-slider-h-val" class="text-brand-500 font-bold">500</span>
+                                    </label>
+                                    <input type="range" id="sb-slider-h" min="10" max="10000" step="10" value="500" oninput="updateBoundPlot()" class="w-full h-1 bg-slate-200 rounded accent-brand-500">
+                                </div>
+                            </div>
+
+                            <div class="relative w-full h-32 bg-white rounded-lg border border-slate-200 p-2 overflow-hidden flex flex-col justify-between shadow-inner">
+                                <svg id="bound-curve-svg" class="w-full h-full" viewBox="0 0 300 100"></svg>
+                                <div class="text-[9px] font-mono text-center text-slate-500 border-t border-slate-100 pt-1">
+                                    Min Samples $m \ge$ <span id="sb-calculated-prob" class="text-brand-600 font-bold">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- HOTKEYS DIALOG MODAL -->
+    <div id="help-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white border border-slate-200 max-w-sm w-full rounded-xl shadow-xl p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="text-sm font-black text-slate-900 flex items-center gap-1.5">
+                    <i class="fa-regular fa-keyboard text-brand-500"></i> Shortcuts Map
+                </h3>
+                <button onclick="toggleHelpModal()" class="text-slate-400 hover:text-slate-700 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="space-y-2.5 text-xs text-slate-600 font-mono">
+                <div class="flex justify-between border-b border-slate-100 pb-1.5">
+                    <span>Forward Deck</span>
+                    <span class="px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-[10px] font-bold text-brand-500">Right Arrow / Space</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-100 pb-1.5">
+                    <span>Backward Deck</span>
+                    <span class="px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-[10px] font-bold text-brand-500">Left Arrow</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-100 pb-1.5">
+                    <span>Toggle Fullscreen</span>
+                    <span class="px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-[10px] font-bold text-brand-500">F</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-100 pb-1.5">
+                    <span>Slide Outline View</span>
+                    <span class="px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-[10px] font-bold text-brand-500">O</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-100 pb-1.5">
+                    <span>Speaker Notes Block</span>
+                    <span class="px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-[10px] font-bold text-brand-500">N</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Empty Boardspace</span>
+                    <span class="px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-[10px] font-bold text-brand-500">W</span>
+                </div>
+            </div>
+            <div class="pt-1.5 text-[10px] text-slate-400 text-center font-bold">
+                Press [Esc] to return to slide view.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        let activeTab = 'notes';
+        let lectureMode = 'student';
+        let notesSidebarVisible = true;
+        let whitepaperMode = false;
+
+        // Interactive states
+        let laserPointerActive = false;
+        let whiteboardActive = false;
+        let whiteboardDrawing = false;
+        let whiteboardColor = '#ef4444'; 
+        let whiteboardCtx = null;
+        let whiteboardCanvas = null;
+
+        // Zoom / Pan variables
+        let currentZoom = 1.0;
+        let panOffset = { x: 0, y: 0 };
+        let isPanning = false;
+        let panModeActive = false;
+        let startPanCoords = { x: 0, y: 0 };
+
+        // Shatter slide interaction coordinate variables
+        let shatterPoints = [
+            { x: 100, y: 150, label: 1 },
+            { x: 200, y: 80, label: -1 },
+            { x: 300, y: 160, label: 1 }
+        ];
+
+        // 12 Slide Structure - Statistical Learning Courseware
+        const SLIDES = [
+            {
+                title: "The Illusion of Prediction",
+                subtitle: "Can a Machine Know What It Has Never Seen?",
+                category: "Paradox & Context",
+                notes: "Welcome, scholars. Today we examine the fundamental challenge of statistical learning: generalization. If a system only observes a limited history, is it mathematically justified in claiming patterns about an unobserved future? We move beyond rote rules to statistical inference.",
+                example: "Wall Street high-frequency trading algorithms trained on years of steady economic distributions collapsed when they encountered unprecedented Black Swan volatility shifts because their out-of-sample mapping assumptions were blind to the change.",
+                interaction: "If an medical imaging model achieves 100% classification accuracy on 10,000 scans inside a clean clinical group, can we confidently deploy it globally tomorrow? Discuss the risks.",
+                transition: "Let's review why this statistical setup forms the absolute backbone of today's technical industry.",
+                imageSvg: `
+                    <svg viewBox="0 0 450 200" class="w-full max-h-[260px] bg-slate-900 rounded-xl p-5 border border-slate-800 shadow-inner">
+                        <text x="20" y="30" fill="#38bdf8" font-size="12" font-family="monospace" font-weight="bold">THE BLACK SWAN INDUCTION PARADOX</text>
+                        <!-- Swans representing known points -->
+                        <circle cx="80" cy="110" r="14" fill="#ffffff" stroke="#0284c7" stroke-width="2"/>
+                        <circle cx="150" cy="90" r="14" fill="#ffffff" stroke="#0284c7" stroke-width="2"/>
+                        <circle cx="220" cy="130" r="14" fill="#ffffff" stroke="#0284c7" stroke-width="2"/>
+                        <text x="150" y="150" fill="#94a3b8" font-size="10" font-family="monospace" text-anchor="middle">Observed Dataset (White Swans)</text>
+                        
+                        <!-- Barrier -->
+                        <line x1="280" y1="40" x2="280" y2="160" stroke="#ef4444" stroke-width="2" stroke-dasharray="4"/>
+                        <text x="280" y="30" fill="#ef4444" font-size="9" font-family="monospace" text-anchor="middle">THE HORIZON</text>
+
+                        <!-- Unknown/Black Swan point -->
+                        <circle cx="360" cy="110" r="14" fill="#0f172a" stroke="#f43f5e" stroke-width="3" class="pulse-element"/>
+                        <text x="360" y="150" fill="#f43f5e" font-size="10" font-family="monospace" text-anchor="middle">Unobserved Node (Black Swan)</text>
+                    </svg>
+                `,
+                content: `
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                        <div class="space-y-4">
+                            <blockquote class="border-l-4 border-sky-500 pl-4 py-2 italic text-slate-600 text-base md:text-lg bg-slate-50 rounded-r-lg leading-relaxed">
+                                "How can a system look at a finite set of historical records and draw assertions about an infinite, uncertain future distribution?"
+                                <cite class="block text-xs text-slate-400 mt-1 font-mono not-italic font-bold">— Hume's Dilemma of Induction</cite>
+                            </blockquote>
+                            <ul class="space-y-2 text-xs md:text-sm text-slate-600">
+                                <li class="flex gap-2 items-start"><i class="fa-solid fa-angle-right text-brand-500 mt-1"></i> <strong>The Core Paradox:</strong> Perfect accuracy on trained data guarantees nothing on unseen configurations without specific model constraints.</li>
+                                <li class="flex gap-2 items-start"><i class="fa-solid fa-angle-right text-brand-500 mt-1"></i> <strong>Inference Strategy:</strong> We trade absolute logical determinism for probabilistic boundaries.</li>
+                            </ul>
+                        </div>
+                        <div id="slide-graphics-target" class="w-full flex justify-center"></div>
+                    </div>
+                `
+            },
+            {
+                title: "Why Should We Learn This?",
+                subtitle: "Engineering the Predictive Future",
+                category: "Industry Value",
+                notes: "If rules are clear, write code. If patterns are complex, write learnable systems. Understanding statistical learning is the direct difference between calling .fit() blindly and designing scalable, production-ready AI pipelines.",
+                example: "Netflix's collaborative filtering recommendation system continuously adjusts latent matrices to represent dynamic human behavior shifts across millions of customers without requiring human software rules.",
+                interaction: "Have you ever experienced a recommender system that worked perfectly and then suddenly got broken/stuck on one weird click? Why did that happen?",
+                transition: "Let's establish our exact target outcomes for this theoretical block.",
+                imageSvg: `
+                    <svg viewBox="0 0 450 200" class="w-full max-h-[260px] bg-slate-50 rounded-xl p-5 border border-slate-200 shadow-inner">
+                        <rect x="20" y="40" width="160" height="120" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                        <text x="100" y="65" fill="#0f172a" font-size="10" font-weight="bold" font-family="monospace" text-anchor="middle">STATIC RULES</text>
+                        <text x="100" y="95" fill="#ef4444" font-size="18" font-weight="black" text-anchor="middle">IF / THEN</text>
+                        <text x="100" y="130" fill="#64748b" font-size="8" text-anchor="middle">Fails in messy realities</text>
+
+                        <path d="M 200 100 L 250 100" stroke="#94a3b8" stroke-width="3" stroke-dasharray="4"/>
+
+                        <rect x="270" y="40" width="160" height="120" rx="6" fill="#f0f9ff" stroke="#0284c7" stroke-width="2"/>
+                        <text x="350" y="65" fill="#0c4a6e" font-size="10" font-weight="bold" font-family="monospace" text-anchor="middle">STATISTICAL ENGINE</text>
+                        <circle cx="350" cy="105" r="22" fill="#0284c7" class="pulse-element"/>
+                        <text x="350" y="110" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">E[X]</text>
+                        <text x="350" y="145" fill="#0369a1" font-size="8" text-anchor="middle">Robust generalization parameters</text>
+                    </svg>
+                `,
+                content: `
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                        <div class="space-y-4">
+                            <h3 class="text-base font-bold text-slate-900 font-mono uppercase tracking-wider">Moving from Code to Optimization</h3>
+                            <p class="text-xs md:text-sm text-slate-600 leading-relaxed">
+                                Business variables contain infinite complexity. Modern system architects must understand error bounds to prevent costly, catastrophic failures when shipping machine models to dynamic real-world pipelines.
+                            </p>
+                            <div class="p-3 bg-sky-50 rounded-lg border border-sky-100 text-xs text-sky-800">
+                                <strong>Engineering Advantage:</strong> Selecting correct hypothesis capacities stops resource waste on overfitted architectures.
+                            </div>
+                        </div>
+                        <div id="slide-graphics-target" class="w-full flex justify-center"></div>
+                    </div>
+                `
+            },
+            {
+                title: "Learning Outcomes",
+                subtitle: "Educational Milestones (CO1 Alignment)",
+                category: "Outcomes Mapping",
+                notes: "These outcomes map directly to major industry requirements. We will trace everything from formal definitions to empirical vs true error bounds, culminating in PAC learning calculations.",
+                example: "Engineering audit teams at systems like Google AI and Meta use these identical mathematical formulations to prove training datasets have high enough sample complexity.",
+                interaction: "Keep these outcomes in your notes. We will review our confidence level across each element at the class wrap-up.",
+                transition: "Let's begin by defining the statistical paradigm itself under classic literature formulations.",
+                imageSvg: `
+                    <svg viewBox="0 0 450 140" class="w-full max-h-[200px] bg-slate-50 rounded-xl p-4 border border-slate-200">
+                        <line x1="40" y1="60" x2="410" y2="60" stroke="#e2e8f0" stroke-width="4"/>
+                        <!-- Out1 -->
+                        <circle cx="60" cy="60" r="14" fill="#0284c7" stroke="#bae6fd" stroke-width="3"/>
+                        <text x="60" y="64" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">01</text>
+                        <text x="60" y="95" fill="#0f172a" font-size="8" font-family="monospace" text-anchor="middle" font-weight="bold">CONCEPTS</text>
+                        <!-- Out2 -->
+                        <circle cx="175" cy="60" r="14" fill="#0284c7" stroke="#bae6fd" stroke-width="3"/>
+                        <text x="175" y="64" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">02</text>
+                        <text x="175" y="95" fill="#0f172a" font-size="8" font-family="monospace" text-anchor="middle" font-weight="bold">HYPOTHESES</text>
+                        <!-- Out3 -->
+                        <circle cx="290" cy="60" r="14" fill="#0284c7" stroke="#bae6fd" stroke-width="3"/>
+                        <text x="290" y="64" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">03</text>
+                        <text x="290" y="95" fill="#0f172a" font-size="8" font-family="monospace" text-anchor="middle" font-weight="bold">ERRORS</text>
+                        <!-- Out4 -->
+                        <circle cx="390" cy="60" r="14" fill="#0f172a" stroke="#cbd5e1" stroke-width="3"/>
+                        <text x="390" y="64" fill="#ffffff" font-size="9" font-weight="bold" text-anchor="middle">04</text>
+                        <text x="390" y="95" fill="#0f172a" font-size="8" font-family="monospace" text-anchor="middle" font-weight="bold">VC LIMITS</text>
+                    </svg>
+                `,
+                content: `
+                    <div class="space-y-4 w-full">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 bg-white border border-slate-200 rounded-xl flex gap-3 shadow-sm">
+                                <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-xs">A</div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-900">Define & Structure Space</h4>
+                                    <p class="text-[11px] text-slate-500 mt-1">Isolate task formulations $T$, performance metrics $P$, experience streams $E$, and model hypotheses $H$.</p>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-white border border-slate-200 rounded-xl flex gap-3 shadow-sm">
+                                <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-xs">B</div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-900">Empirical vs True Error Analysis</h4>
+                                    <p class="text-[11px] text-slate-500 mt-1">Contrast training loss calculations against unseen test distribution failures.</p>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-white border border-slate-200 rounded-xl flex gap-3 shadow-sm">
+                                <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-xs">C</div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-900">PAC Sample Bound Solvers</h4>
+                                    <p class="text-[11px] text-slate-500 mt-1">Determine minimum dataset bounds required for Probably Approximately Correct assertions.</p>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-white border border-slate-200 rounded-xl flex gap-3 shadow-sm">
+                                <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-xs">D</div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-900">VC Structural Capacity</h4>
+                                    <p class="text-[11px] text-slate-500 mt-1">Analyze shattering capabilities to verify infinite hypothesis spaces.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="slide-graphics-target" class="w-full flex justify-center"></div>
+                    </div>
+                `
+            },
+            {
+                title: "Demystifying Statistical Learning",
+                subtitle: "The Tom Mitchell Framework",
+                category: "Core Framework",
+                notes: "Mitchell's formulation is standard. A system learns if its performance P at task T improves with experience E. If you cannot explicitly state these three variables, you cannot optimize parameters.",
+                example: "A machine vision lane finder: Task T is steering trajectory regression, Experience E is sensory video frames, Performance P is human correction-free travel ratio.",
+                interaction: "Try mapping T, P, and E for an automated system designed to detect fraudulent transactions.",
+                transition: "Let's explore the biological and system mechanics of these processes.",
+                hasInteractiveDemo: "mitchellPlayground",
+                content: ""
+            },
+            {
+                title: "The Core Framework: The Learning Problem",
+                subtitle: "The Four Pillars of the Learning Pipeline",
+                category: "Structural Pipeline",
+                notes: "These pillars act as a manufacturing line: storing data cleanly, abstracting models through training, generalizing structures to unseen test distributions, and evaluating output losses for feedback.",
+                example: "Autonomous flight control databases abstract sensor noise, generalize actions during strong wind drafts, and constantly evaluate flight deviation vectors.",
+                interaction: "Which of these pillars is closest to the 'No Free Lunch' challenge? (Hint: Generalization).",
+                transition: "Let's convert these structural stages into elegant math models.",
+                hasInteractiveDemo: "fourPillars",
+                content: ""
+            },
+            {
+                title: "The Hypothesis Space (H)",
+                subtitle: "Hypotheses, Ordering, and Consistency",
+                category: "Mathematical Model",
+                notes: "The target function f is absolute reality. It is unknown. Our algorithm evaluates a hypothesis space H—our model toolbox—to select one hypothesis g that mimics f closely across data sample D.",
+                example: "In credit scoring, the target rule is the applicant's future default reality. Our hypothesis space is linear boundaries. Our selection g is the approved boundary.",
+                interaction: "Why can't we inspect the perfect function 'f' directly? (Answer: Reality mappings are high-dimensional or computationally inaccessible directly).",
+                imageSvg: `
+                    <svg viewBox="0 0 450 180" class="w-full max-h-[240px] bg-slate-50 rounded-xl p-4 border border-slate-200 shadow-inner">
+                        <text x="225" y="25" fill="#0f172a" font-size="11" font-weight="bold" font-family="monospace" text-anchor="middle">MAPPING TARGET (f) TO CHOSEN HYPOTHESIS (g)</text>
+                        
+                        <!-- True function box -->
+                        <rect x="30" y="50" width="100" height="80" rx="8" fill="#f0f9ff" stroke="#0284c7" stroke-width="2"/>
+                        <text x="80" y="80" fill="#0c4a6e" font-size="10" font-weight="bold" text-anchor="middle">Target Concept f(x)</text>
+                        <text x="80" y="105" fill="#0284c7" font-size="8" font-family="mono" text-anchor="middle">Unknown Reality</text>
+
+                        <!-- Connector -->
+                        <path d="M 140 90 L 190 90" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+
+                        <!-- Hypothesis space with version space circle -->
+                        <rect x="200" y="50" width="220" height="80" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                        <circle cx="310" cy="90" r="30" fill="#bae6fd" opacity="0.4"/>
+                        <text x="310" y="85" fill="#0c4a6e" font-size="10" font-weight="bold" text-anchor="middle">Hypothesis Space H</text>
+                        <text x="310" y="105" fill="#0284c7" font-size="8" font-family="mono" text-anchor="middle">Consistent g &approx; f</text>
+                        
+                        <defs>
+                            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                `,
+                content: `
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                        <div class="space-y-4">
+                            <p class="text-xs md:text-sm text-slate-600 leading-relaxed font-mono">
+                                Let $D = \{(x_1, y_1), \dots, (x_N, y_N)\}$ be our data sample. A hypothesis $h \in H$ is <strong>consistent</strong> with $D$ if and only if $h(x_i) = y_i$ for all observed pairs in the sample set.
+                            </p>
+                            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono space-y-1">
+                                <span class="text-[10px] font-bold text-slate-400 block uppercase">KEY TERM: VERSION SPACE</span>
+                                <p class="text-slate-600">The subset of all hypotheses in $H$ that are perfectly consistent with the training set $D$.</p>
+                            </div>
+                        </div>
+                        <div id="slide-graphics-target" class="w-full flex justify-center"></div>
+                    </div>
+                `
+            },
+            {
+                title: "Training Error vs. True Error",
+                subtitle: "Empirical Risk vs. Generalization Error",
+                category: "Mathematical Model",
+                notes: "This is our primary split: Empirical Error (loss on sample points we see) vs. True Error (expected failure probability across the whole real distribution F). Our goal is establishing bounds to keep their divergence low.",
+                example: "A text parsing engine scoring 100% on historical templates but failing completely when users inject slang in wild chats.",
+                interaction: "How can we calculate our expected True Error if the full global distribution F is mathematically hidden?",
+                imageSvg: `
+                    <svg viewBox="0 0 450 180" class="w-full max-h-[240px] bg-slate-50 rounded-xl p-4 border border-slate-200 shadow-inner">
+                        <!-- Left split -->
+                        <rect x="30" y="40" width="170" height="100" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                        <text x="115" y="65" fill="#0f172a" font-size="10" font-weight="bold" text-anchor="middle">Training Error (Ein)</text>
+                        <text x="115" y="95" fill="#0284c7" font-size="16" font-family="monospace" font-weight="black" text-anchor="middle">Empirical Risk</text>
+                        <text x="115" y="120" fill="#64748b" font-size="8" text-anchor="middle">Calculated on sample set D</text>
+
+                        <!-- Scale separator -->
+                        <line x1="225" y1="40" x2="225" y2="140" stroke="#0284c7" stroke-width="2" stroke-dasharray="2"/>
+
+                        <!-- Right split -->
+                        <rect x="250" y="40" width="170" height="100" rx="8" fill="#f0f9ff" stroke="#0284c7" stroke-width="2"/>
+                        <text x="335" y="65" fill="#0c4a6e" font-size="10" font-weight="bold" text-anchor="middle">True Error (Eout)</text>
+                        <text x="335" y="95" fill="#0369a1" font-size="16" font-family="monospace" font-weight="black" text-anchor="middle">Expected Risk</text>
+                        <text x="335" y="120" fill="#0c4a6e" font-size="8" text-anchor="middle">Probability on hidden distribution F</text>
+                    </svg>
+                `,
+                content: `
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center font-mono">
+                        <div class="space-y-4 text-xs md:text-sm">
+                            <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                                <span class="font-bold text-slate-800">Empirical Risk ($E_{in}$):</span>
+                                <p class="text-slate-500 mt-1">$E_{in}(h) = \frac{1}{N} \sum_{i=1}^N \mathbb{I}(h(x_i) \neq y_i)$</p>
+                            </div>
+                            <div class="p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                                <span class="font-bold text-slate-800">Generalization Error ($E_{out}$):</span>
+                                <p class="text-slate-500 mt-1">$E_{out}(h) = \mathbb{P}_{x \sim F}(h(x) \neq f(x))$</p>
+                            </div>
+                        </div>
+                        <div id="slide-graphics-target" class="w-full flex justify-center"></div>
+                    </div>
+                `
+            },
+            {
+                title: "Feasibility of Learning",
+                subtitle: "The Inductive Blindspot & No Free Lunch",
+                category: "The Math Crisis",
+                notes: "Without making prior assumptions (Inductive Bias), any model's average generalization on unseen data performs identically to a simple coin flip. Universal learnability requires structural constraints.",
+                example: "Applying high-capacity deep networks directly on uncorrelated chaotic noise vectors yields generalization results matching exactly 50% random binary guessing.",
+                interaction: "State a typical inductive bias we assume when building classic linear classifiers.",
+                transition: "Let's explore how we resolve this blindspot using probability bounds.",
+                hasInteractiveDemo: "binaryBlindspot",
+                content: ""
+            },
+            {
+                title: "PAC Learning: Probably Approximately Correct",
+                subtitle: "Probably Approximately Correct Framework",
+                category: "The PAC Resolution",
+                notes: "Leslie Valiant introduced PAC bounds. We want to prove that, with high probability (Probably), our model error is less than our tolerance epsilon (Approximately Correct). Our slide features an interactive bound curve.",
+                example: "Proving model criteria guarantees: Testing 2,300 random patients ensures drug error claims fall safely within margins.",
+                interaction: "Open the Math Labs tab on the right side of the screen to adjust the PAC parameters and see sample scales change in real time.",
+                transition: "Let's explore what happens when hypothesis options are infinite.",
+                hasInteractiveDemo: "binAnalogy",
+                content: ""
+            },
+            {
+                title: "VC Dimension: Measuring Model Capacity",
+                subtitle: "Shattering & Infinite Hypothesis Spaces",
+                category: "Capacity Limits",
+                notes: "When parameters are continuous, hypothesis options are infinite. We use VC Dimension to measure capacity. Our custom simulation proves linear boundary shattering capabilities.",
+                example: "Linear perceptrons in 2D planes can shatter 3 nodes under any binary label combinations. They cannot shatter 4 diagonal nodes, setting their VC dimension to exactly 3.",
+                interaction: "Try changing the binary label options in our visual interactive demo below to prove line fits are always available for three points.",
+                transition: "Let's consolidate our structural learning roadmap.",
+                hasInteractiveDemo: "vcShattering",
+                content: ""
+            },
+            {
+                title: "Summary: Connecting the Dots",
+                subtitle: "The Complete Lecture Blueprint at a Glance",
+                category: "Revision Map",
+                notes: "Let's run our master recap: We map reality f using sample D to find selection g. Inductive bias protects our models from the No Free Lunch limit. PAC and VC bounds guarantee performance.",
+                example: "Engineering systems review this exact roadmap to determine if deep network deployments can be statistically validated.",
+                interaction: "Trace each step of this connected timeline. Does the progression from error concepts to capacity limits make sense?",
+                imageSvg: `
+                    <svg viewBox="0 0 450 180" class="w-full max-h-[240px] bg-slate-900 rounded-xl p-4 border border-slate-800 shadow-inner">
+                        <text x="225" y="25" fill="#38bdf8" font-size="12" font-family="monospace" font-weight="bold" text-anchor="middle">STATISTICAL LEARNING MAP</text>
+                        
+                        <!-- Block 1 -->
+                        <rect x="20" y="50" width="85" height="80" rx="6" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+                        <text x="62" y="80" fill="#ffffff" font-size="9" text-anchor="middle">1. Problem</text>
+                        <text x="62" y="105" fill="#38bdf8" font-size="8" font-family="mono" text-anchor="middle">g &approx; f</text>
+                        
+                        <!-- Path -->
+                        <line x1="105" y1="90" x2="130" y2="90" stroke="#475569" stroke-width="2"/>
+
+                        <!-- Block 2 -->
+                        <rect x="130" y="50" width="85" height="80" rx="6" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+                        <text x="172" y="80" fill="#ffffff" font-size="9" text-anchor="middle">2. Error Split</text>
+                        <text x="172" y="105" fill="#38bdf8" font-size="8" font-family="mono" text-anchor="middle">Ein vs Eout</text>
+
+                        <!-- Path -->
+                        <line x1="215" y1="90" x2="240" y2="90" stroke="#475569" stroke-width="2"/>
+
+                        <!-- Block 3 -->
+                        <rect x="240" y="50" width="85" height="80" rx="6" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+                        <text x="282" y="80" fill="#ffffff" font-size="9" text-anchor="middle">3. Feasibility</text>
+                        <text x="282" y="105" fill="#38bdf8" font-size="8" font-family="mono" text-anchor="middle">PAC Bounds</text>
+
+                        <!-- Path -->
+                        <line x1="325" y1="90" x2="350" y2="90" stroke="#475569" stroke-width="2"/>
+
+                        <!-- Block 4 -->
+                        <rect x="350" y="50" width="85" height="80" rx="6" fill="#0284c7" stroke="#38bdf8" stroke-width="2"/>
+                        <text x="392" y="80" fill="#ffffff" font-size="9" text-anchor="middle">4. Capacity</text>
+                        <text x="392" y="105" fill="#e0f2fe" font-size="8" font-family="mono" text-anchor="middle">VC Dimension</text>
+                    </svg>
+                `,
+                content: `
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                        <div class="space-y-4">
+                            <h3 class="text-base font-bold text-slate-900 font-mono">Theoretical Guarantees Unified</h3>
+                            <p class="text-xs text-slate-500 leading-relaxed font-mono">
+                                In summary: We control $E_{in}(g)$ directly. PAC complexity equations guarantee that as dataset size $N \rightarrow \infty$, $|E_{in}(g) - E_{out}(g)| \le \epsilon$ with high probability, governed cleanly by the VC dimension constraints.
+                            </p>
+                        </div>
+                        <div id="slide-graphics-target" class="w-full flex justify-center"></div>
+                    </div>
+                `
+            },
+            {
+                title: "Putting Theory to Work",
+                subtitle: "Practice Problems & Homework Solvers",
+                category: "Evaluation Matrix",
+                notes: "These final practice problems evaluate understanding. Try working the formulas on sample size and intervals. The live math calculators will confirm your analytical inputs.",
+                example: "A production quality auditor verifying error thresholds on diagnostic tools using PAC complexity models.",
+                interaction: "Use our interactive homework calculators below to run the calculations and double-check your mathematical solutions.",
+                transition: "You have completed our lecture deck! Let's check out our live sandbox modules.",
+                hasInteractiveDemo: "homeworkCalculators",
+                content: ""
+            }
+        ];
+
+        function initSidebarOutline() {
+            const listContainer = document.getElementById('outline-list');
+            listContainer.innerHTML = '';
+            
+            SLIDES.forEach((slide, idx) => {
+                const btn = document.createElement('button');
+                btn.onclick = () => jumpToSlide(idx);
+                btn.id = `outline-btn-${idx}`;
+                btn.className = `w-full text-left px-3 py-2.5 rounded-lg text-xs font-semibold transition flex items-center gap-2 ${
+                    idx === currentSlide 
+                    ? 'bg-brand-600 text-white shadow' 
+                    : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                }`;
+                btn.innerHTML = `
+                    <span class="font-mono text-[10px] opacity-65 shrink-0 font-bold">${(idx + 1).toString().padStart(2, '0')}</span>
+                    <span class="truncate flex-1">${slide.title}</span>
+                `;
+                listContainer.appendChild(btn);
+            });
+        }
+
+        function jumpToSlide(index) {
+            if (index < 0 || index >= SLIDES.length) return;
+            if (whitepaperMode) {
+                toggleWhitepaperMode(); 
+            }
+            currentSlide = index;
+            resetZoom(); 
+            renderCurrentSlide();
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                jumpToSlide(currentSlide - 1);
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < SLIDES.length - 1) {
+                jumpToSlide(currentSlide + 1);
+            }
+        }
+
+        function toggleNotesSidebar() {
+            notesSidebarVisible = !notesSidebarVisible;
+            const sidebar = document.getElementById('notes-sidebar');
+            const btn = document.getElementById('btn-toggle-notes');
+            if (notesSidebarVisible) {
+                sidebar.className = "w-96 bg-white border-l border-slate-200 flex flex-col transition-all duration-300 shrink-0 shadow-md";
+                btn.className = "px-3 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg text-xs font-semibold text-brand-500 transition flex items-center gap-1.5";
+            } else {
+                sidebar.className = "w-0 bg-white flex flex-col transition-all duration-300 shrink-0 overflow-hidden";
+                btn.className = "px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 transition flex items-center gap-1.5";
+            }
+        }
+
+        function toggleMode(mode) {
+            lectureMode = mode;
+            document.getElementById('btn-student-mode').className = mode === 'student'
+                ? "px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-brand-500 bg-sky-50 border border-sky-200 shadow-sm"
+                : "px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
+            
+            document.getElementById('btn-teacher-mode').className = mode === 'teacher'
+                ? "px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-brand-500 bg-sky-50 border border-sky-200 shadow-sm"
+                : "px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
+            
+            renderCurrentSlide();
+        }
+
+        function setActiveTab(tab) {
+            activeTab = tab;
+            const tabNotes = document.getElementById('tab-notes');
+            const tabSandbox = document.getElementById('tab-sandbox');
+            const panelNotes = document.getElementById('notes-content');
+            const panelSandbox = document.getElementById('sandbox-content');
+
+            if (tab === 'notes') {
+                tabNotes.className = "flex-1 py-2 text-center text-xs font-bold rounded transition bg-white text-brand-600 border border-slate-200 shadow-sm";
+                tabSandbox.className = "flex-1 py-2 text-center text-xs font-bold rounded transition text-slate-500 hover:text-slate-800";
+                panelNotes.classList.remove('hidden');
+                panelSandbox.classList.add('hidden');
+            } else {
+                tabSandbox.className = "flex-1 py-2 text-center text-xs font-bold rounded transition bg-white text-brand-600 border border-slate-200 shadow-sm";
+                tabNotes.className = "flex-1 py-2 text-center text-xs font-bold rounded transition text-slate-500 hover:text-slate-850";
+                panelNotes.classList.add('hidden');
+                panelSandbox.classList.remove('hidden');
+            }
+        }
+
+        function adjustZoom(factor) {
+            currentZoom = Math.min(Math.max(currentZoom + factor, 0.5), 2.5);
+            applyZoomTransform();
+        }
+
+        function resetZoom() {
+            currentZoom = 1.0;
+            panOffset = { x: 0, y: 0 };
+            applyZoomTransform();
+        }
+
+        function togglePanMode() {
+            panModeActive = !panModeActive;
+            applyZoomTransform();
+        }
+
+        function applyZoomTransform() {
+            const wrapper = document.getElementById('zoom-content-wrapper');
+            if (wrapper) {
+                wrapper.style.transform = `translate(${panOffset.x}px, ${panOffset.y}px) scale(${currentZoom})`;
+            }
+            const indicator = document.getElementById('zoom-factor-indicator');
+            if (indicator) {
+                indicator.innerText = `${Math.round(currentZoom * 100)}%`;
+            }
+            
+            const panBtn = document.getElementById('btn-pan-mode');
+            if (panBtn) {
+                if (panModeActive) {
+                    panBtn.className = "w-6 h-6 rounded bg-sky-100 border border-sky-200 text-brand-500 flex items-center justify-center text-xs transition shadow-sm";
+                } else {
+                    panBtn.className = "w-6 h-6 rounded bg-slate-50 hover:bg-slate-100 text-slate-500 flex items-center justify-center text-[10px] transition";
+                }
+            }
+        }
+
+        function toggleFullscreen() {
+            const container = document.documentElement; 
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().then(() => {
+                    document.getElementById('fullscreen-icon').className = "fa-solid fa-compress";
+                }).catch(err => {
+                    console.error(`Fullscreen request failed: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen().then(() => {
+                    document.getElementById('fullscreen-icon').className = "fa-solid fa-expand";
+                });
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('outline-sidebar');
+            sidebar.classList.toggle('w-72');
+            sidebar.classList.toggle('w-0');
+            sidebar.classList.toggle('overflow-hidden');
+        }
+
+        function toggleHelpModal() {
+            const modal = document.getElementById('help-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function toggleWhitepaperMode() {
+            whitepaperMode = !whitepaperMode;
+            const overlay = document.getElementById('whitepaper-overlay');
+            const btn = document.getElementById('btn-whitepaper-toggle');
+            
+            if (whitepaperMode) {
+                overlay.classList.remove('hidden');
+                btn.innerHTML = `<i class="fa-solid fa-chalkboard text-yellow-500"></i> Active Deck`;
+                btn.className = "px-3 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg text-xs font-semibold text-brand-500 transition flex items-center gap-1.5 shadow-inner";
+                if (!whiteboardActive) {
+                    toggleWhiteboard();
+                }
+            } else {
+                overlay.classList.add('hidden');
+                btn.innerHTML = `<i class="fa-solid fa-chalkboard text-emerald-600"></i> Blackboard`;
+                btn.className = "px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition flex items-center gap-1.5";
+                clearWhiteboard();
+                if (whiteboardActive) {
+                    toggleWhiteboard();
+                }
+            }
+        }
+
+        function renderCurrentSlide() {
+            const slide = SLIDES[currentSlide];
+            clearWhiteboard();
+            resizeWhiteboardCanvas();
+
+            SLIDES.forEach((_, idx) => {
+                const btn = document.getElementById(`outline-btn-${idx}`);
+                if (btn) {
+                    if (idx === currentSlide) {
+                        btn.className = "w-full text-left px-3 py-2.5 rounded-lg text-xs font-semibold transition flex items-center gap-2 bg-brand-600 text-white shadow";
+                    } else {
+                        btn.className = "w-full text-left px-3 py-2.5 rounded-lg text-xs font-semibold transition flex items-center gap-2 text-slate-600 hover:bg-slate-200 hover:text-slate-900";
+                    }
+                }
+            });
+
+            document.getElementById('slide-category').innerText = slide.category;
+            document.getElementById('slide-index-indicator').innerText = `SLIDE ${(currentSlide + 1).toString().padStart(2, '0')} OF ${SLIDES.length.toString().padStart(2, '0')}`;
+            document.getElementById('slide-ratio-counter').innerText = `Slide ${currentSlide + 1} / ${SLIDES.length}`;
+            document.getElementById('slide-progress').value = currentSlide;
+
+            document.getElementById('academic-footer-page').innerText = `Slide ${currentSlide + 1} / ${SLIDES.length}`;
+            document.getElementById('academic-footer-topic').innerText = `${slide.title}`;
+
+            document.getElementById('btn-prev').disabled = currentSlide === 0;
+            document.getElementById('btn-next').disabled = currentSlide === SLIDES.length - 1;
+
+            document.getElementById('speaker-note-text').innerText = slide.notes;
+            document.getElementById('slide-example-text').innerText = slide.example;
+            document.getElementById('slide-interaction-text').innerText = slide.interaction;
+
+            const stage = document.getElementById('slide-stage');
+            stage.className = "slide-enter flex-1 flex flex-col justify-center p-4 md:p-8";
+
+            setTimeout(() => {
+                stage.classList.add('slide-active');
+            }, 50);
+
+            if (slide.hasInteractiveDemo) {
+                stage.innerHTML = renderInteractiveDemo(slide.hasInteractiveDemo);
+                initializeDemoLogic(slide.hasInteractiveDemo);
+            } else {
+                stage.innerHTML = `
+                    <div class="space-y-4 max-w-full">
+                        <div class="space-y-1">
+                            <h2 class="text-2xl md:text-3xl font-black tracking-tight text-slate-900 leading-tight uppercase font-sans">${slide.title}</h2>
+                            <h3 class="text-xs md:text-sm font-bold text-brand-500 font-mono tracking-wider">${slide.subtitle}</h3>
+                        </div>
+                        <div class="w-full border-t border-slate-150 my-1"></div>
+                        <div class="flex-1 min-h-[260px] flex items-center justify-center">
+                            ${slide.content}
+                        </div>
+                    </div>
+                `;
+                
+                const imgHost = document.getElementById('slide-graphics-target');
+                if (imgHost && slide.imageSvg) {
+                    imgHost.innerHTML = slide.imageSvg;
+                }
+            }
+        }
+
+        function renderInteractiveDemo(demoKey) {
+            if (demoKey === 'mitchellPlayground') {
+                return `
+                    <div class="space-y-4 w-full max-w-4xl mx-auto flex flex-col h-full justify-center">
+                        <div class="space-y-1">
+                            <h2 class="text-xl md:text-2xl font-black tracking-tight text-slate-900 uppercase">Mitchell's ML Framework</h2>
+                            <h3 class="text-xs md:text-sm font-bold text-brand-500 font-mono">Dynamic System Mapping Sandbox</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <div class="space-y-3 font-mono">
+                                <p class="text-slate-600 text-[11px] leading-relaxed font-sans">Select a task scenario to dynamically evaluate how the Mitchell Framework segments Experience (E), Task (T), and Performance (P):</p>
+                                <div class="space-y-2">
+                                    <button onclick="selectMitchellTask('spam')" id="btn-mitchell-spam" class="w-full text-left p-3 rounded-lg border border-sky-200 bg-sky-50 text-brand-500 flex items-center justify-between transition text-xs shadow-sm">
+                                        <span>Dynamic Email Spam Classification</span>
+                                        <i class="fa-solid fa-chevron-right text-brand-500"></i>
+                                    </button>
+                                    <button onclick="selectMitchellTask('chess')" id="btn-mitchell-chess" class="w-full text-left p-3 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-950 flex items-center justify-between transition text-xs shadow-sm">
+                                        <span>Competitive Game-Tree Chess Engine</span>
+                                        <i class="fa-solid fa-chevron-right text-slate-400"></i>
+                                    </button>
+                                    <button onclick="selectMitchellTask('vision')" id="btn-mitchell-vision" class="w-full text-left p-3 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-950 flex items-center justify-between transition text-xs shadow-sm">
+                                        <span>Autonomous Vehicular Vision Stack</span>
+                                        <i class="fa-solid fa-chevron-right text-slate-400"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border border-slate-200 space-y-3 font-mono text-xs leading-relaxed shadow-inner">
+                                <div class="border-l-4 border-blue-600 pl-3 py-0.5">
+                                    <span class="text-[9px] text-brand-600 uppercase font-extrabold tracking-widest block">Task Segment (T)</span>
+                                    <p id="mitchell-t-text" class="text-slate-800 font-bold text-xs">Loading...</p>
+                                </div>
+                                <div class="border-l-4 border-emerald-500 pl-3 py-0.5">
+                                    <span class="text-[9px] text-emerald-600 uppercase font-extrabold tracking-widest block">Performance Metric (P)</span>
+                                    <p id="mitchell-p-text" class="text-slate-800 font-bold text-xs">Loading...</p>
+                                </div>
+                                <div class="border-l-4 border-orange-500 pl-3 py-0.5">
+                                    <span class="text-[9px] text-orange-600 uppercase font-extrabold tracking-widest block">Experience Dataset (E)</span>
+                                    <p id="mitchell-e-text" class="text-slate-800 font-bold text-xs">Loading...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (demoKey === 'fourPillars') {
+                return `
+                    <div class="space-y-4 w-full max-w-4xl mx-auto flex flex-col h-full justify-center">
+                        <div class="space-y-1">
+                            <h2 class="text-xl md:text-2xl font-black tracking-tight text-slate-900 uppercase">The Four Pipeline Pillars</h2>
+                            <h3 class="text-xs md:text-sm font-bold text-brand-500 font-mono">Structural Operations Interactive Walkthrough</h3>
+                        </div>
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                            <button onclick="selectPillar(0)" id="btn-p-0" class="p-3 rounded-lg border-2 border-brand-500 bg-sky-50 text-center space-y-2 transition shadow-sm">
+                                <div class="w-8 h-8 rounded bg-sky-100 text-brand-500 flex items-center justify-center mx-auto text-sm"><i class="fa-solid fa-database"></i></div>
+                                <span class="font-bold text-xs block text-slate-800">1. Data Storage</span>
+                            </button>
+                            <button onclick="selectPillar(1)" id="btn-p-1" class="p-3 rounded-lg border-2 border-slate-200 bg-white text-center space-y-2 transition hover:border-slate-300 shadow-sm">
+                                <div class="w-8 h-8 rounded bg-slate-100 text-slate-500 flex items-center justify-center mx-auto text-sm"><i class="fa-solid fa-shapes"></i></div>
+                                <span class="font-bold text-xs block text-slate-500">2. Abstraction</span>
+                            </button>
+                            <button onclick="selectPillar(2)" id="btn-p-2" class="p-3 rounded-lg border-2 border-slate-200 bg-white text-center space-y-2 transition hover:border-slate-300 shadow-sm">
+                                <div class="w-8 h-8 rounded bg-slate-100 text-slate-500 flex items-center justify-center mx-auto text-sm"><i class="fa-solid fa-compass"></i></div>
+                                <span class="font-bold text-xs block text-slate-500">3. Generalization</span>
+                            </button>
+                            <button onclick="selectPillar(3)" id="btn-p-3" class="p-3 rounded-lg border-2 border-slate-200 bg-white text-center space-y-2 transition hover:border-slate-300 shadow-sm">
+                                <div class="w-8 h-8 rounded bg-slate-100 text-slate-500 flex items-center justify-center mx-auto text-sm"><i class="fa-solid fa-chart-line"></i></div>
+                                <span class="font-bold text-xs block text-slate-500">4. Evaluation</span>
+                            </button>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs leading-relaxed text-slate-700 shadow-inner" id="pillar-description-panel">
+                            Loading information...
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (demoKey === 'binaryBlindspot') {
+                return `
+                    <div class="space-y-4 w-full max-w-4xl mx-auto flex flex-col h-full justify-center">
+                        <div class="space-y-1">
+                            <h2 class="text-xl md:text-2xl font-black tracking-tight text-slate-900 uppercase">The Inductive Blindspot</h2>
+                            <h3 class="text-xs md:text-sm font-bold text-brand-500 font-mono">The Divergence Puzzle Sandbox</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner">
+                            <div class="space-y-3">
+                                <p class="text-slate-600 text-xs leading-relaxed">Toggle unseen sample nodes to see how separate hypotheses $h_A$ and $h_B$ maintain identical in-sample accuracy but diverge completely out-of-sample.</p>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-mono font-bold text-slate-500 w-16">Feature 1:</span>
+                                    <button id="btn-unseen-x1" onclick="toggleUnseenFeature(1)" class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-bold font-mono text-brand-500 shadow-sm">1 (Fixed)</button>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-mono font-bold text-slate-500 w-16">Feature 2:</span>
+                                    <button id="btn-unseen-x2" onclick="toggleUnseenFeature(2)" class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-bold font-mono text-brand-500 shadow-sm">0</button>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-mono font-bold text-slate-500 w-16">Feature 3:</span>
+                                    <button id="btn-unseen-x3" onclick="toggleUnseenFeature(3)" class="px-3 py-1 bg-white border border-slate-200 rounded text-xs font-bold font-mono text-brand-500 shadow-sm">0</button>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border border-slate-200 flex flex-col justify-between shadow-sm">
+                                <div class="space-y-1 text-center">
+                                    <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">Class Predictions</span>
+                                    <div class="grid grid-cols-2 gap-2 mt-2">
+                                        <div class="p-2.5 bg-slate-50 rounded border border-slate-200">
+                                            <span class="text-[9px] text-slate-400 font-mono block">Model $h_A$ output</span>
+                                            <span id="blind-ha-val" class="text-lg font-bold font-mono text-emerald-600">1</span>
+                                        </div>
+                                        <div class="p-2.5 bg-slate-50 rounded border border-slate-200">
+                                            <span class="text-[9px] text-slate-400 font-mono block">Model $h_B$ output</span>
+                                            <span id="blind-hb-val" class="text-lg font-bold font-mono text-rose-600">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-full h-px bg-slate-100 my-2"></div>
+                                <p class="text-[10px] font-mono text-slate-400 leading-relaxed text-center">No Free Lunch proves that without pre-assumed shapes (Inductive Bias), out-of-sample predictions remain completely arbitrary.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (demoKey === 'binAnalogy') {
+                return `
+                    <div class="space-y-4 w-full max-w-4xl mx-auto flex flex-col h-full justify-center">
+                        <div class="space-y-1">
+                            <h2 class="text-xl md:text-2xl font-black tracking-tight text-slate-900 uppercase">The PAC Bound Sandbox</h2>
+                            <h3 class="text-xs md:text-sm font-bold text-brand-500 font-mono">Sample Complexity Calculator</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner">
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-[10px] font-mono text-slate-500 flex justify-between">
+                                        <span>Target Eout error boundary (&epsilon;)</span>
+                                        <span id="slide-eps-val" class="text-brand-500 font-bold">0.05</span>
+                                    </label>
+                                    <input type="range" id="slider-slide-eps" min="0.01" max="0.15" step="0.01" value="0.05" oninput="calculatePACSlideBound()" class="w-full h-1 bg-slate-200 rounded accent-brand-500">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-mono text-slate-500 flex justify-between">
+                                        <span>Failure delta limit (&delta;)</span>
+                                        <span id="slide-delta-val" class="text-brand-500 font-bold">0.05</span>
+                                    </label>
+                                    <input type="range" id="slider-slide-delta" min="0.01" max="0.2" step="0.01" value="0.05" oninput="calculatePACSlideBound()" class="w-full h-1 bg-slate-200 rounded accent-brand-500">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-mono text-slate-500 flex justify-between">
+                                        <span>Hypothesis Space capacity |H|</span>
+                                        <span id="slide-h-val" class="text-brand-500 font-bold">1000</span>
+                                    </label>
+                                    <input type="range" id="slider-slide-h" min="10" max="100000" step="50" value="1000" oninput="calculatePACSlideBound()" class="w-full h-1 bg-slate-200 rounded accent-brand-500">
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg border border-slate-200 flex flex-col justify-between shadow-sm">
+                                <div class="space-y-2 font-mono text-xs">
+                                    <span class="text-[9px] uppercase font-bold tracking-widest text-slate-400 block text-center">Required Sample Size</span>
+                                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-center">
+                                        <span class="text-slate-400 text-[10px]">Min Datapoints $m \ge$</span>
+                                        <span id="slide-pac-n-result" class="text-2xl font-black block text-brand-500 mt-1">0</span>
+                                    </div>
+                                    <div class="w-full h-px bg-slate-100 my-1"></div>
+                                    <div class="text-[10px] text-slate-500 leading-relaxed text-center" id="slide-pac-analytical-verdict">
+                                        As error bounds decrease, required sample points expand at a rate of $1/\epsilon$.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (demoKey === 'vcShattering') {
+                return `
+                    <div class="space-y-4 w-full max-w-4xl mx-auto flex flex-col h-full justify-center">
+                        <div class="space-y-1">
+                            <h2 class="text-xl md:text-2xl font-black tracking-tight text-slate-900 uppercase">Shattering & VC Bounds</h2>
+                            <h3 class="text-xs md:text-sm font-bold text-brand-500 font-mono">2D Plane Linear Shatter Lab</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner">
+                            <div class="space-y-2">
+                                <p class="text-slate-600 text-xs leading-relaxed">Click any point on the plane to flip its binary label ($+$ / $-$). Notice how a single line can separate any binary label combination for 3 non-collinear nodes, proving $VC \ge 3$.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <button onclick="flipAllShatterLabels()" class="px-2.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 rounded text-[10px] font-bold font-mono text-slate-700 transition shadow-sm">Invert All Labels</button>
+                                    <button onclick="resetShatterPoints()" class="px-2.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 rounded text-[10px] font-bold font-mono text-slate-700 transition shadow-sm">Reset Nodes</button>
+                                </div>
+                            </div>
+                            <div class="relative w-full aspect-[4/3] bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+                                <canvas id="vc-canvas" class="w-full h-full cursor-pointer"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (demoKey === 'homeworkCalculators') {
+                return `
+                    <div class="space-y-4 w-full max-w-4xl mx-auto flex flex-col h-full justify-center">
+                        <div class="space-y-1">
+                            <h2 class="text-xl md:text-2xl font-black tracking-tight text-slate-900 uppercase">Homework Solvers</h2>
+                            <h3 class="text-xs md:text-sm font-bold text-brand-500 font-mono">Theoretical Homework Auditing Lab</h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-inner">
+                            <!-- Task 1 Solver -->
+                            <div class="p-4 bg-white rounded-lg border border-slate-200 space-y-3 shadow-sm">
+                                <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-sky-600 block">Homework 1: Bound Risk Calculator</span>
+                                <div class="grid grid-cols-3 gap-1.5">
+                                    <div>
+                                        <label class="text-[9px] font-mono text-slate-400 block">Models |H|</label>
+                                        <input type="number" id="hw1-m" value="65536" class="w-full p-1.5 bg-slate-50 rounded border border-slate-200 text-xs font-bold font-mono text-slate-800">
+                                    </div>
+                                    <div>
+                                        <label class="text-[9px] font-mono text-slate-400 block">Samples N</label>
+                                        <input type="number" id="hw1-n" value="1000" class="w-full p-1.5 bg-slate-50 rounded border border-slate-200 text-xs font-bold font-mono text-slate-800">
+                                    </div>
+                                    <div>
+                                        <label class="text-[9px] font-mono text-slate-400 block">Limit &epsilon;</label>
+                                        <input type="number" id="hw1-eps" value="0.05" step="0.01" class="w-full p-1.5 bg-slate-50 rounded border border-slate-200 text-xs font-bold font-mono text-slate-800">
+                                    </div>
+                                </div>
+                                <button onclick="solveHomeworkTask1()" class="w-full py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded text-xs font-bold font-mono transition shadow-sm">Calculate PAC Fail Limit</button>
+                                <div class="bg-slate-50 p-2.5 rounded border border-slate-200 font-mono text-[11px] text-slate-600">
+                                    Failure Probability Limit $\delta \le$ <span id="hw1-result" class="text-sky-600 font-bold">--</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Task 2 Solver -->
+                            <div class="p-4 bg-white rounded-lg border border-slate-200 space-y-3 shadow-sm">
+                                <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-brand-500 block">Homework 2: Minimum N Solver</span>
+                                <div class="grid grid-cols-3 gap-1.5">
+                                    <div>
+                                        <label class="text-[9px] font-mono text-slate-400 block">Hypotheses |H|</label>
+                                        <input type="number" id="hw2-m" value="50000" class="w-full p-1.5 bg-slate-50 rounded border border-slate-200 text-xs font-bold font-mono text-slate-800">
+                                    </div>
+                                    <div>
+                                        <label class="text-[9px] font-mono text-slate-400 block">Fail rate &delta;</label>
+                                        <input type="number" id="hw2-delta" value="0.05" step="0.01" class="w-full p-1.5 bg-slate-50 rounded border border-slate-200 text-xs font-bold font-mono text-slate-800">
+                                    </div>
+                                    <div>
+                                        <label class="text-[9px] font-mono text-slate-400 block">Limit &epsilon;</label>
+                                        <input type="number" id="hw2-eps" value="0.03" step="0.01" class="w-full p-1.5 bg-slate-50 rounded border border-slate-200 text-xs font-bold font-mono text-slate-800">
+                                    </div>
+                                </div>
+                                <button onclick="solveHomeworkTask2()" class="w-full py-1.5 bg-brand-600 hover:bg-brand-600/90 text-white rounded text-xs font-bold font-mono transition shadow-sm">Calculate Target N</button>
+                                <div class="bg-slate-50 p-2.5 rounded border border-slate-200 font-mono text-[11px] text-slate-600">
+                                    Required Data Samples $N \ge$ <span id="hw2-result" class="text-brand-500 font-bold">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        let unseenX1 = 1, unseenX2 = 0, unseenX3 = 0;
+
+        function initializeDemoLogic(demoKey) {
+            if (demoKey === 'mitchellPlayground') {
+                selectMitchellTask('spam');
+            } else if (demoKey === 'fourPillars') {
+                selectPillar(0);
+            } else if (demoKey === 'binaryBlindspot') {
+                updateBlindspotOutputs();
+            } else if (demoKey === 'binAnalogy') {
+                calculatePACSlideBound();
+            } else if (demoKey === 'vcShattering') {
+                initVCShatterPlot();
+            } else if (demoKey === 'homeworkCalculators') {
+                solveHomeworkTask1();
+                solveHomeworkTask2();
+            }
+        }
+
+        function selectMitchellTask(taskType) {
+            const btnSpam = document.getElementById('btn-mitchell-spam');
+            const btnChess = document.getElementById('btn-mitchell-chess');
+            const btnVision = document.getElementById('btn-mitchell-vision');
+
+            btnSpam.className = "w-full text-left p-3 rounded-lg border border-slate-200 bg-white text-slate-500 flex items-center justify-between transition text-xs shadow-sm";
+            btnChess.className = "w-full text-left p-3 rounded-lg border border-slate-200 bg-white text-slate-500 flex items-center justify-between transition text-xs shadow-sm";
+            btnVision.className = "w-full text-left p-3 rounded-lg border border-slate-200 bg-white text-slate-500 flex items-center justify-between transition text-xs shadow-sm";
+
+            if (taskType === 'spam') {
+                btnSpam.className = "w-full text-left p-3 rounded-lg border border-sky-200 bg-sky-50 text-brand-500 flex items-center justify-between transition text-xs shadow-sm font-bold";
+                document.getElementById('mitchell-t-text').innerText = "Sorting incoming mail content streams into Spam (+1) or Ham (-1).";
+                document.getElementById('mitchell-p-text').innerText = "False-positive ratio (Valid emails erroneously categorized as hostile).";
+                document.getElementById('mitchell-e-text').innerText = "Vast logs of user-vetted historical email payloads.";
+            } else if (taskType === 'chess') {
+                btnChess.className = "w-full text-left p-3 rounded-lg border border-sky-200 bg-sky-50 text-brand-500 flex items-center justify-between transition text-xs shadow-sm font-bold";
+                document.getElementById('mitchell-t-text').innerText = "Selecting game piece placements to optimize winning configurations.";
+                document.getElementById('mitchell-p-text').innerText = "Competitive win ratio against standard tournament grandmasters.";
+                document.getElementById('mitchell-e-text').innerText = "Database tracks of 5,000,000 self-play simulator iterations.";
+            } else if (taskType === 'vision') {
+                btnVision.className = "w-full text-left p-3 rounded-lg border border-sky-200 bg-sky-50 text-brand-500 flex items-center justify-between transition text-xs shadow-sm font-bold";
+                document.getElementById('mitchell-t-text').innerText = "Extracting lane vectors and projecting driving trajectory commands.";
+                document.getElementById('mitchell-p-text').innerText = "Average travel miles traveled cleanly before human manual override is required.";
+                document.getElementById('mitchell-e-text').innerText = "High-definition camera frame streams matched with driver physical responses.";
+            }
+        }
+
+        function selectPillar(idx) {
+            for (let i = 0; i < 4; i++) {
+                const btn = document.getElementById(`btn-p-${i}`);
+                if (btn) {
+                    btn.className = "p-3 rounded-lg border-2 border-slate-200 bg-white text-center space-y-2 transition hover:border-slate-300 shadow-sm";
+                    const span = btn.querySelector('span');
+                    if (span) span.className = "font-bold text-xs block text-slate-500";
+                }
+            }
+            const activeBtn = document.getElementById(`btn-p-${idx}`);
+            if (activeBtn) {
+                activeBtn.className = "p-3 rounded-lg border-2 border-brand-500 bg-sky-50 text-center space-y-2 transition shadow-sm";
+                const span = activeBtn.querySelector('span');
+                if (span) span.className = "font-bold text-xs block text-slate-900";
+            }
+
+            const descPanel = document.getElementById('pillar-description-panel');
+            if (idx === 0) {
+                descPanel.innerHTML = `<strong class="text-slate-950 block text-sm mb-1">Pillar 1: Data Storage</strong>The fundamental database layout. Securely catalogs multi-dimensional attribute arrays so your learning program can process matrix representations efficiently.`;
+            } else if (idx === 1) {
+                descPanel.innerHTML = `<strong class="text-slate-950 block text-sm mb-1">Pillar 2: Abstraction</strong>Distilling structural representations and decision shapes out of messy raw data. Our optimization programs tweak weights to capture underlying rules.`;
+            } else if (idx === 2) {
+                descPanel.innerHTML = `<strong class="text-slate-950 block text-sm mb-1">Pillar 3: Generalization</strong>The core goal. Correctly evaluating out-of-sample data points that the learning architecture has never observed during training.`;
+            } else if (idx === 3) {
+                descPanel.innerHTML = `<strong class="text-slate-950 block text-sm mb-1">Pillar 4: Evaluation</strong>Directly scoring current generalization bounds on separate, isolated test splits to prevent underfitting or overfitting assumptions.`;
+            }
+        }
+
+        function toggleUnseenFeature(featIdx) {
+            if (featIdx === 2) unseenX2 = unseenX2 === 0 ? 1 : 0;
+            if (featIdx === 3) unseenX3 = unseenX3 === 0 ? 1 : 0;
+
+            const btn2 = document.getElementById('btn-unseen-x2');
+            const btn3 = document.getElementById('btn-unseen-x3');
+
+            if (btn2) btn2.innerText = unseenX2;
+            if (btn3) btn3.innerText = unseenX3;
+
+            updateBlindspotOutputs();
+        }
+
+        function updateBlindspotOutputs() {
+            const ha = unseenX2 === 0 ? 1 : 0;
+            const hb = unseenX3 === 0 ? 0 : 1;
+
+            const haEl = document.getElementById('blind-ha-val');
+            const hbEl = document.getElementById('blind-hb-val');
+
+            if (haEl) {
+                haEl.innerText = ha;
+                haEl.className = ha === 1 ? "text-lg font-bold font-mono text-emerald-600" : "text-lg font-bold font-mono text-rose-600";
+            }
+            if (hbEl) {
+                hbEl.innerText = hb;
+                hbEl.className = hb === 1 ? "text-lg font-bold font-mono text-emerald-600" : "text-lg font-bold font-mono text-rose-600";
+            }
+        }
+
+        function calculatePACSlideBound() {
+            const eps = parseFloat(document.getElementById('slider-slide-eps').value);
+            const delta = parseFloat(document.getElementById('slider-slide-delta').value);
+            const hVal = parseFloat(document.getElementById('slider-slide-h').value);
+
+            document.getElementById('slide-eps-val').innerText = eps.toFixed(2);
+            document.getElementById('slide-delta-val').innerText = delta.toFixed(2);
+            document.getElementById('slide-h-val').innerText = hVal.toLocaleString();
+
+            const result = Math.ceil((1 / eps) * (Math.log(hVal) + Math.log(1 / delta)));
+            document.getElementById('slide-pac-n-result').innerText = result.toLocaleString();
+        }
+
+        function initVCShatterPlot() {
+            const canvas = document.getElementById('vc-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            canvas.onclick = function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const clickY = e.clientY - rect.top;
+
+                // Find closest point and flip label
+                let closest = null;
+                let minDist = 30;
+                shatterPoints.forEach(pt => {
+                    const dist = Math.hypot(pt.x - clickX, pt.y - clickY);
+                    if (dist < minDist) {
+                        closest = pt;
+                        minDist = dist;
+                    }
+                });
+
+                if (closest) {
+                    closest.label = closest.label === 1 ? -1 : 1;
+                    drawVCShatter();
+                }
+            };
+
+            drawVCShatter();
+        }
+
+        function flipAllShatterLabels() {
+            shatterPoints.forEach(pt => {
+                pt.label = pt.label === 1 ? -1 : 1;
+            });
+            drawVCShatter();
+        }
+
+        function resetShatterPoints() {
+            shatterPoints = [
+                { x: 100, y: 150, label: 1 },
+                { x: 200, y: 80, label: -1 },
+                { x: 300, y: 160, label: 1 }
+            ];
+            drawVCShatter();
+        }
+
+        function drawVCShatter() {
+            const canvas = document.getElementById('vc-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(0, 0, w, h);
+
+            // Compute and draw separating line if labels are not all identical
+            const allPos = shatterPoints.every(pt => pt.label === 1);
+            const allNeg = shatterPoints.every(pt => pt.label === -1);
+
+            if (!allPos && !allNeg) {
+                // Approximate simple separating line for visualization
+                let sumPos = { x: 0, y: 0, count: 0 };
+                let sumNeg = { x: 0, y: 0, count: 0 };
+                
+                shatterPoints.forEach(pt => {
+                    if (pt.label === 1) {
+                        sumPos.x += pt.x;
+                        sumPos.y += pt.y;
+                        sumPos.count++;
+                    } else {
+                        sumNeg.x += pt.x;
+                        sumNeg.y += pt.y;
+                        sumNeg.count++;
+                    }
+                });
+
+                const meanPos = { x: sumPos.x / sumPos.count, y: sumPos.y / sumPos.count };
+                const meanNeg = { x: sumNeg.x / sumNeg.count, y: sumNeg.y / sumNeg.count };
+                
+                // Draw perpendicular separator
+                const mid = { x: (meanPos.x + meanNeg.x) / 2, y: (meanPos.y + meanNeg.y) / 2 };
+                const dy = meanPos.y - meanNeg.y;
+                const dx = meanPos.x - meanNeg.x;
+                
+                ctx.strokeStyle = '#0284c7';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                if (Math.abs(dx) > 0.01) {
+                    const slope = -dx / dy;
+                    ctx.moveTo(0, mid.y - slope * mid.x);
+                    ctx.lineTo(w, mid.y + slope * (w - mid.x));
+                } else {
+                    ctx.moveTo(mid.x, 0);
+                    ctx.lineTo(mid.x, h);
+                }
+                ctx.stroke();
+            }
+
+            // Draw points
+            shatterPoints.forEach(pt => {
+                ctx.fillStyle = pt.label === 1 ? '#10b981' : '#f43f5e';
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, 14, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 12px monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(pt.label === 1 ? '+' : '-', pt.x, pt.y);
+            });
+        }
+
+        function solveHomeworkTask1() {
+            const m = parseFloat(document.getElementById('hw1-m').value);
+            const n = parseFloat(document.getElementById('hw1-n').value);
+            const eps = parseFloat(document.getElementById('hw1-eps').value);
+
+            const prob = 2 * m * Math.exp(-2 * eps * eps * n);
+            document.getElementById('hw1-result').innerText = prob > 1 ? "1.00 (Unbounded)" : prob.toFixed(5);
+        }
+
+        function solveHomeworkTask2() {
+            const m = parseFloat(document.getElementById('hw2-m').value);
+            const delta = parseFloat(document.getElementById('hw2-delta').value);
+            const eps = parseFloat(document.getElementById('hw2-eps').value);
+
+            const numerator = Math.log(2 * m / delta);
+            const denominator = 2 * eps * eps;
+            const nRequired = Math.ceil(numerator / denominator);
+            document.getElementById('hw2-result').innerText = nRequired.toLocaleString();
+        }
+
+        function initWhiteboard() {
+            whiteboardCanvas = document.getElementById('whiteboard-canvas');
+            if (!whiteboardCanvas) return;
+            whiteboardCtx = whiteboardCanvas.getContext('2d');
+            
+            window.addEventListener('resize', resizeWhiteboardCanvas);
+            resizeWhiteboardCanvas();
+
+            const viewportFrame = document.getElementById('viewport-content-frame');
+            viewportFrame.addEventListener('mousedown', startDrawing);
+            viewportFrame.addEventListener('mousemove', drawLine);
+            viewportFrame.addEventListener('mouseup', stopDrawing);
+            viewportFrame.addEventListener('mouseleave', stopDrawing);
+
+            viewportFrame.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) startDrawing(e.touches[0]);
+            });
+            viewportFrame.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 1) drawLine(e.touches[0]);
+            });
+            viewportFrame.addEventListener('touchend', stopDrawing);
+        }
+
+        function resizeWhiteboardCanvas() {
+            if (!whiteboardCanvas) return;
+            const rect = whiteboardCanvas.parentElement.getBoundingClientRect();
+            whiteboardCanvas.width = rect.width;
+            whiteboardCanvas.height = rect.height;
+        }
+
+        function toggleWhiteboard() {
+            whiteboardActive = !whiteboardActive;
+            const canvas = document.getElementById('whiteboard-canvas');
+            const btn = document.getElementById('btn-whiteboard');
+            const palette = document.getElementById('presentation-tools-palette');
+
+            if (whiteboardActive) {
+                canvas.classList.remove('pointer-events-none');
+                canvas.classList.add('cursor-crosshair');
+                btn.className = "px-3 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg text-xs font-semibold text-brand-500 transition shadow-inner";
+                palette.classList.remove('hidden');
+                
+                if (laserPointerActive) toggleLaserPointer();
+                if (panModeActive) togglePanMode();
+            } else {
+                canvas.classList.add('pointer-events-none');
+                canvas.classList.remove('cursor-crosshair');
+                btn.className = "px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition";
+                palette.classList.add('hidden');
+            }
+        }
+
+        function setWhiteboardColor(color) {
+            whiteboardColor = color;
+        }
+
+        function clearWhiteboard() {
+            if (whiteboardCtx && whiteboardCanvas) {
+                whiteboardCtx.clearRect(0, 0, whiteboardCanvas.width, whiteboardCanvas.height);
+            }
+        }
+
+        function startDrawing(e) {
+            if (!whiteboardActive || panModeActive) return;
+            whiteboardDrawing = true;
+            
+            const rect = whiteboardCanvas.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+            const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+            
+            const x = (clientX - rect.left) * (whiteboardCanvas.width / rect.width);
+            const y = (clientY - rect.top) * (whiteboardCanvas.height / rect.height);
+            
+            whiteboardCtx.beginPath();
+            whiteboardCtx.moveTo(x, y);
+        }
+
+        function drawLine(e) {
+            if (!whiteboardActive || !whiteboardDrawing || panModeActive) return;
+            
+            const rect = whiteboardCanvas.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+            const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+            
+            const x = (clientX - rect.left) * (whiteboardCanvas.width / rect.width);
+            const y = (clientY - rect.top) * (whiteboardCanvas.height / rect.height);
+            
+            whiteboardCtx.strokeStyle = whiteboardColor;
+            whiteboardCtx.lineWidth = 3;
+            whiteboardCtx.lineCap = 'round';
+            whiteboardCtx.lineTo(x, y);
+            whiteboardCtx.stroke();
+        }
+
+        function stopDrawing() {
+            whiteboardDrawing = false;
+        }
+
+        function initLaserPointer() {
+            const viewport = document.getElementById('viewport-content-frame');
+            const laser = document.getElementById('laser-pointer');
+            if (!viewport || !laser) return;
+
+            viewport.addEventListener('mousemove', (e) => {
+                if (!laserPointerActive) return;
+                const rect = viewport.getBoundingClientRect();
+                
+                const x = (e.clientX - rect.left);
+                const y = (e.clientY - rect.top);
+                
+                laser.style.left = `${x}px`;
+                laser.style.top = `${y}px`;
+            });
+
+            viewport.addEventListener('mouseleave', () => {
+                if (laserPointerActive) laser.classList.add('hidden');
+            });
+
+            viewport.addEventListener('mouseenter', () => {
+                if (laserPointerActive) laser.classList.remove('hidden');
+            });
+        }
+
+        function toggleLaserPointer() {
+            laserPointerActive = !laserPointerActive;
+            const laser = document.getElementById('laser-pointer');
+            const btn = document.getElementById('btn-laser');
+
+            if (laserPointerActive) {
+                laser.classList.remove('hidden');
+                btn.className = "px-3 py-1.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-lg text-xs font-semibold text-brand-500 transition shadow-inner";
+                
+                if (whiteboardActive) toggleWhiteboard();
+                if (panModeActive) togglePanMode();
+            } else {
+                laser.classList.add('hidden');
+                btn.className = "px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition";
+            }
+        }
+
+        function initViewportPan() {
+            const frame = document.getElementById('viewport-content-frame');
+            if (!frame) return;
+
+            frame.addEventListener('mousedown', (e) => {
+                if (panModeActive || e.shiftKey || e.button === 1) {
+                    isPanning = true;
+                    startPanCoords = { x: e.clientX - panOffset.x, y: e.clientY - panOffset.y };
+                    frame.style.cursor = 'grabbing';
+                    e.preventDefault();
+                }
+            });
+
+            frame.addEventListener('mousemove', (e) => {
+                if (isPanning) {
+                    panOffset.x = e.clientX - startPanCoords.x;
+                    panOffset.y = e.clientY - startPanCoords.y;
+                    applyZoomTransform();
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (isPanning) {
+                    isPanning = false;
+                    if (frame) frame.style.cursor = '';
+                }
+            });
+        }
+
+        let sandboxPoints = [];
+        let sandboxModelType = 'overfit';
+
+        function initSandboxPlotter() {
+            const canvas = document.getElementById('sandbox-plot-canvas');
+            if (!canvas) return;
+
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            canvas.addEventListener('mousedown', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const label = e.button === 0 ? 1 : -1;
+                sandboxPoints.push({ x, y, label });
+                drawSandboxPlot();
+            });
+
+            canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+            drawSandboxPlot();
+        }
+
+        function setSandboxModel(modelType) {
+            sandboxModelType = modelType;
+            
+            document.getElementById('btn-sb-linear').className = "flex-1 py-1.5 rounded text-[10px] font-bold border border-slate-300 bg-white text-slate-700 shadow-sm";
+            document.getElementById('btn-sb-quad').className = "flex-1 py-1.5 rounded text-[10px] font-bold border border-slate-300 bg-white text-slate-700 shadow-sm";
+            document.getElementById('btn-sb-overfit').className = "flex-1 py-1.5 rounded text-[10px] font-bold border border-slate-300 bg-white text-slate-700 shadow-sm";
+
+            if (modelType === 'linear') {
+                document.getElementById('btn-sb-linear').className = "flex-1 py-1.5 rounded text-[10px] font-bold border border-sky-200 bg-sky-50 text-brand-500 shadow-sm";
+            } else if (modelType === 'quadratic') {
+                document.getElementById('btn-sb-quad').className = "flex-1 py-1.5 rounded text-[10px] font-bold border border-sky-200 bg-sky-50 text-brand-500 shadow-sm";
+            } else if (modelType === 'overfit') {
+                document.getElementById('btn-sb-overfit').className = "flex-1 py-1.5 rounded text-[10px] font-bold border border-sky-200 bg-sky-50 text-brand-500 shadow-sm";
+            }
+
+            drawSandboxPlot();
+        }
+
+        function clearSandboxPoints() {
+            sandboxPoints = [];
+            drawSandboxPlot();
+        }
+
+        function drawSandboxPlot() {
+            const canvas = document.getElementById('sandbox-plot-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillRect(0, 0, w, h);
+
+            if (sandboxModelType === 'linear') {
+                ctx.strokeStyle = '#0284c7';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(0, h * 0.7);
+                ctx.lineTo(w, h * 0.3);
+                ctx.stroke();
+            } else if (sandboxModelType === 'quadratic') {
+                ctx.strokeStyle = '#10b981';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                for (let x = 0; x < w; x++) {
+                    const normalizedX = (x / w) - 0.5;
+                    const y = h * 0.5 + (normalizedX * normalizedX * h * 1.5);
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            } else {
+                ctx.strokeStyle = '#f43f5e';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                for (let x = 0; x < w; x++) {
+                    const y = h * 0.5 + Math.sin(x * 0.04) * 35 + Math.cos(x * 0.01) * 15;
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+
+            sandboxPoints.forEach(pt => {
+                ctx.fillStyle = pt.label === 1 ? '#10b981' : '#f43f5e';
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, 5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+        }
+
+        function updateBoundPlot() {
+            const eps = parseFloat(document.getElementById('sb-slider-eps').value);
+            const delta = parseFloat(document.getElementById('sb-slider-delta').value);
+            const hVal = parseFloat(document.getElementById('sb-slider-h').value);
+
+            document.getElementById('sb-slider-eps-val').innerText = eps.toFixed(2);
+            document.getElementById('sb-slider-delta-val').innerText = delta.toFixed(2);
+            document.getElementById('sb-slider-h-val').innerText = hVal;
+
+            const boundVal = Math.ceil((1 / eps) * (Math.log(hVal) + Math.log(1 / delta)));
+            document.getElementById('sb-calculated-prob').innerText = boundVal.toLocaleString();
+
+            const svg = document.getElementById('bound-curve-svg');
+            if (!svg) return;
+
+            let pathD = "M 20 80 ";
+            for (let i = 0; i <= 20; i++) {
+                const stepEps = 0.01 + (i / 20) * 0.19;
+                const tempBound = Math.ceil((1 / stepEps) * (Math.log(hVal) + Math.log(1 / delta)));
+                const screenY = 90 - (Math.min(tempBound, 15000) / 15000) * 70;
+                const screenX = 20 + (i / 20) * 260;
+                pathD += `L ${screenX} ${screenY} `;
+            }
+
+            const currentX = 20 + ((eps - 0.01) / 0.19) * 260;
+            const currentY = 90 - (Math.min(boundVal, 15000) / 15000) * 70;
+
+            svg.innerHTML = `
+                <line x1="20" y1="90" x2="280" y2="90" stroke="#cbd5e1" stroke-width="1.5" />
+                <line x1="20" y1="10" x2="20" y2="90" stroke="#cbd5e1" stroke-width="1.5" />
+                <path d="${pathD}" fill="none" stroke="#0284c7" stroke-width="2" />
+                <circle cx="${currentX}" cy="${currentY}" r="4.5" fill="#0f172a" class="pulse-element" />
+                <text x="280" y="98" fill="#475569" font-size="7" font-family="monospace" text-anchor="end">&epsilon; (Tolerance Limit)</text>
+                <text x="15" y="8" fill="#475569" font-size="7" font-family="monospace">Complexity m</text>
+            `;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const activeTag = document.activeElement.tagName.toLowerCase();
+            if (activeTag === 'input' || activeTag === 'textarea') return;
+
+            switch(e.key) {
+                case 'ArrowRight':
+                case ' ':
+                    e.preventDefault();
+                    nextSlide();
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    prevSlide();
+                    break;
+                case 'f':
+                case 'F':
+                    e.preventDefault();
+                    toggleFullscreen();
+                    break;
+                case 'o':
+                case 'O':
+                    e.preventDefault();
+                    toggleSidebar();
+                    break;
+                case 'n':
+                case 'N':
+                    e.preventDefault();
+                    toggleNotesSidebar();
+                    break;
+                case 'w':
+                case 'W':
+                    e.preventDefault();
+                    toggleWhitepaperMode();
+                    break;
+                case 'm':
+                case 'M':
+                    e.preventDefault();
+                    toggleMode(lectureMode === 'student' ? 'teacher' : 'student');
+                    break;
+                case 'Escape':
+                    const modal = document.getElementById('help-modal');
+                    if (!modal.classList.contains('hidden')) modal.classList.add('hidden');
+                    break;
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            const icon = document.getElementById('fullscreen-icon');
+            if (document.fullscreenElement) {
+                icon.className = "fa-solid fa-compress";
+            } else {
+                icon.className = "fa-solid fa-expand";
+            }
+            setTimeout(resizeWhiteboardCanvas, 150);
+        });
+
+        window.onload = function() {
+            initSidebarOutline();
+            renderCurrentSlide();
+            initWhiteboard();
+            initLaserPointer();
+            initViewportPan();
+            
+            // Sandbox tools
+            initSandboxPlotter();
+            updateBoundPlot();
+        }
+    </script>
+</body>
+</html>
