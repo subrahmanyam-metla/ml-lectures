@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept Learning & General-to-Specific Ordering | Aditya University</title>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- FontAwesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- MathJax Configuration & Engine -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          auNavy: '#0B2A52',
+          auNavyLight: '#163E72',
+          auOrange: '#EA5A1E',
+          auOrangeHover: '#C94A16',
+          auBlueBg: '#F4F7FA',
+          auBorder: '#CBD5E1',
+          auText: '#1E293B'
+        },
+        fontFamily: {
+          sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          serif: ['"Playfair Display"', 'serif'],
+          mono: ['"IBM Plex Mono"', 'monospace']
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+:root {
+  --au-navy: #0B2A52;
+  --au-navy-light: #163E72;
+  --au-orange: #EA5A1E;
+  --au-orange-hover: #C94A16;
+  --au-bg: #FFFFFF;
+  --au-bg-alt: #F8FAFC;
+  --au-border: #E2E8F0;
+  --au-text: #0F172A;
+  --au-muted: #475569;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--au-bg);
+  color: var(--au-text);
+  overflow: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+.slide-container {
+  animation: fadeInSlide 0.3s ease-out forwards;
+}
+
+@keyframes fadeInSlide {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Formula & Math styling overrides */
+.math-block {
+  font-family: 'IBM Plex Mono', monospace;
+  background: #0B2A52;
+  color: #F8FAFC;
+  border-left: 4px solid #EA5A1E;
+}
+
+mjx-container[jax="CHTML"][display="true"] {
+  margin: 0.5em 0 !important;
+}
+
+/* Zoom & Pan Viewport Settings */
+#stageArea {
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+
+#zoomViewport {
+  width: 100%;
+  height: 100%;
+  transform-origin: 0 0;
+  transition: transform 0.05s ease-out;
+  cursor: grab;
+  will-change: transform;
+}
+
+#zoomViewport.panning {
+  cursor: grabbing;
+}
+</style>
+</head>
+<body class="h-screen w-screen flex flex-col bg-white">
+
+<!-- TOP HEADER BAR -->
+<header class="bg-auNavy text-white flex items-center justify-between px-4 md:px-6 py-2 shadow-md z-40 shrink-0 border-b border-white/10">
+  <!-- Logo & Department Info Block -->
+  <div class="flex items-center gap-3 md:gap-5">
+    <div class="flex flex-col items-start gap-1">
+      <img src="https://www.facultyplus.com/wp-content/uploads/2025/07/Aditya-university-logo.webp" 
+           alt="Aditya University Logo" 
+           class="h-8 md:h-10 bg-white px-2 py-0.5 rounded object-contain shadow-sm"
+           onerror="this.onerror=null; this.src='https://placehold.co/180x45/ffffff/0B2A52?text=Aditya+University';">
+      <div class="text-[10px] md:text-[11px] font-semibold text-slate-200 leading-tight">
+        <div>School of Computing</div>
+        <div class="text-auOrange font-bold">Department of AIML</div>
+      </div>
+    </div>
+    
+    <div class="hidden sm:flex flex-col border-l border-white/20 pl-3 md:pl-4">
+      <h1 class="text-xs md:text-sm font-bold text-white tracking-wide">Machine Learning (241AI005)</h1>
+      <span class="text-[11px] md:text-xs text-auOrange font-medium">Chapter 2: Concept Learning & General-to-Specific Ordering</span>
+    </div>
+  </div>
+
+  <!-- Middle Info / Dropdown Navigation -->
+  <div class="hidden md:flex items-center gap-3">
+    <span class="text-xs text-slate-300 font-mono">Module Jump:</span>
+    <select id="slideJumpSelect" onchange="jumpToSlide(parseInt(this.value))" class="bg-auNavyLight text-white border border-white/20 rounded-lg px-3 py-1.5 text-xs font-medium focus:outline-none focus:border-auOrange cursor-pointer">
+      <option value="0">1. Welcome & Learning Objectives</option>
+      <option value="1">2. What is Concept Learning?</option>
+      <option value="2">3. The EnjoySport Domain</option>
+      <option value="3">4. Formal Task Definition</option>
+      <option value="4">5. Instance vs. Hypothesis Space</option>
+      <option value="5">6. Expressing Hypotheses</option>
+      <option value="6">7. General-to-Specific Ordering ($\ge_g$)</option>
+      <option value="7">8. Partial Order & Hypothesis Lattice</option>
+      <option value="8">9. FIND-S Algorithm Mechanics</option>
+      <option value="9">10. FIND-S Step-by-Step Execution</option>
+      <option value="10">11. Limitations of FIND-S</option>
+      <option value="11">12. Candidate Consistency vs. Satisfying</option>
+      <option value="12">13. Version Spaces & Boundaries</option>
+      <option value="13">14. Candidate-Elimination Mechanics</option>
+      <option value="14">15. Boundary Update Rules</option>
+      <option value="15">16. Candidate-Elimination Trace</option>
+      <option value="16">17. Inductive Bias Formalization</option>
+      <option value="17">18. Futility of Unbiased Learning ($2^X$)</option>
+      <option value="18">19. Chapter Summary & Quiz</option>
+    </select>
+  </div>
+
+  <!-- Action Controls -->
+  <div class="flex items-center gap-2">
+    <button onclick="openPlayground('ce')" class="bg-auOrange hover:bg-auOrangeHover text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+      <i class="fa-solid fa-flask"></i>
+      <span>Interactive Lab</span>
+    </button>
+    <button id="toggleNotesBtn" onclick="toggleNotesPanel()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-white/20">
+      <i class="fa-solid fa-book-open"></i>
+      <span class="hidden lg:inline">Prof. Notes</span>
+    </button>
+    <button onclick="toggleReadingMode()" id="readingModeBtn" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 border border-white/20">
+      <i class="fa-solid fa-align-left"></i>
+      <span class="hidden lg:inline">View Mode</span>
+    </button>
+  </div>
+</header>
+
+<!-- PROGRESS TRACK BAR -->
+<div class="w-full bg-slate-100 h-1.5 relative overflow-hidden shrink-0 border-b border-slate-200">
+  <div id="progressBar" class="bg-auOrange h-full transition-all duration-300" style="width: 5.26%;"></div>
+</div>
+
+<!-- MAIN WORKSPACE -->
+<main id="workspace" class="flex-1 flex overflow-hidden relative bg-white">
+
+  <!-- LEFT / CENTER STAGE (SLIDE PRESENTATION WITH ZOOM & PAN) -->
+  <section id="stageArea" class="flex-1 relative flex justify-center bg-slate-50/50">
+    
+    <!-- ZOOM & PAN FLOATING CONTROLS TOOLBAR -->
+    <div class="absolute top-4 right-4 z-30 bg-auNavy/90 backdrop-blur-md text-white rounded-xl shadow-xl p-1.5 flex items-center gap-1 border border-white/20">
+      <button onclick="zoomOut()" title="Zoom Out (-)" class="w-8 h-8 rounded-lg hover:bg-white/20 flex items-center justify-center text-xs transition">
+        <i class="fa-solid fa-magnifying-glass-minus"></i>
+      </button>
+      <span id="zoomLevelDisplay" class="font-mono text-[11px] px-2 font-bold min-w-[45px] text-center text-auOrange">100%</span>
+      <button onclick="zoomIn()" title="Zoom In (+)" class="w-8 h-8 rounded-lg hover:bg-white/20 flex items-center justify-center text-xs transition">
+        <i class="fa-solid fa-magnifying-glass-plus"></i>
+      </button>
+      <div class="h-4 w-[1px] bg-white/20 mx-1"></div>
+      <button onclick="resetZoom()" title="Reset Zoom & Pan" class="px-2 py-1 rounded-lg hover:bg-white/20 flex items-center gap-1 text-[11px] font-medium transition">
+        <i class="fa-solid fa-rotate-left"></i>
+        <span>Reset</span>
+      </button>
+    </div>
+
+    <!-- Navigation Overlay Buttons -->
+    <button onclick="prevSlide()" id="prevBtn" class="fixed left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-auNavy/80 hover:bg-auOrange text-white flex items-center justify-center shadow-lg transition z-30 disabled:opacity-30 disabled:hover:bg-auNavy/80">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <button onclick="nextSlide()" id="nextBtn" class="fixed right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-auNavy/80 hover:bg-auOrange text-white flex items-center justify-center shadow-lg transition z-30 disabled:opacity-30 disabled:hover:bg-auNavy/80">
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+    <!-- Interactive Zoom and Pan Container Viewport -->
+    <div id="zoomViewport" class="w-full h-full p-6 md:p-10 overflow-y-auto flex justify-center">
+      <!-- Slide Content Wrapper -->
+      <div id="slideContent" class="w-full max-w-5xl min-h-full flex flex-col justify-between pb-12">
+        <!-- Dynamic Slide content inserted via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT PROFESSOR'S NOTES PANEL (Collapsible) -->
+  <aside id="notesPanel" class="w-80 md:w-96 bg-slate-50 border-l border-slate-200 flex flex-col transition-all duration-300 z-20 shrink-0 shadow-lg">
+    <div class="p-4 bg-auNavy text-white flex items-center justify-between shadow-sm">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-chalkboard-user text-auOrange"></i>
+        <h3 class="font-bold text-xs uppercase tracking-wider font-mono">Lecture Annotations & Insights</h3>
+      </div>
+      <button onclick="toggleNotesPanel()" class="text-slate-300 hover:text-white text-sm">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div id="notesContent" class="p-5 overflow-y-auto flex-1 text-sm text-slate-700 leading-relaxed space-y-4">
+      <!-- Dynamic notes content -->
+    </div>
+  </aside>
+
+</main>
+
+<!-- GLOBAL FOOTER BAR (Appears across all slides) -->
+<footer class="h-10 bg-auNavy text-slate-300 border-t border-slate-700/60 px-4 md:px-8 flex items-center justify-between text-[11px] md:text-xs font-mono z-40 shrink-0 select-none">
+  <!-- Datetime -->
+  <div class="flex items-center gap-2 text-slate-300">
+    <i class="fa-regular fa-clock text-auOrange"></i>
+    <span id="footerDateTime">--</span>
+  </div>
+
+  <!-- Topic Being Covered -->
+  <div class="hidden md:flex items-center gap-2 max-w-[42%] truncate">
+    <i class="fa-solid fa-book-open-reader text-auOrange"></i>
+    <span class="text-slate-200 truncate" id="footerTopic">Topic: Concept Learning & General-to-Specific Ordering</span>
+  </div>
+
+  <!-- Instructor Info -->
+  <div class="flex items-center gap-2">
+    <i class="fa-solid fa-user-tie text-auOrange"></i>
+    <span class="font-semibold text-white">M. Subrahmanyam, Asst. Prof. AIML</span>
+  </div>
+
+  <!-- Page / Slide Number -->
+  <div class="flex items-center gap-1.5 bg-auNavyLight px-2.5 py-0.5 rounded border border-white/10 font-bold text-white">
+    <i class="fa-regular fa-file-lines text-auOrange"></i>
+    <span id="footerPageNum">Page 1 / 19</span>
+  </div>
+</footer>
+
+<!-- INTERACTIVE LAB MODAL (PLAYGROUND) -->
+<div id="labModal" class="fixed inset-0 bg-auNavy/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl w-full max-w-6xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+    
+    <!-- Modal Header -->
+    <div class="bg-auNavy px-6 py-4 text-white flex items-center justify-between border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="p-2 bg-auOrange/20 text-auOrange rounded-lg">
+          <i class="fa-solid fa-vial-circle-check text-xl"></i>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold">Interactive Concept Learning Playground</h2>
+          <p class="text-xs text-slate-300">Simulate FIND-S, Candidate-Elimination, and Version Space Lattice updates live</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <!-- Lab Selector -->
+        <div class="bg-auNavyLight rounded-lg p-1 border border-white/20 flex text-xs font-semibold">
+          <button onclick="switchLabTab('ce')" id="tabBtnCE" class="px-3 py-1 rounded-md text-white bg-auOrange">Candidate Elimination</button>
+          <button onclick="switchLabTab('finds')" id="tabBtnFindS" class="px-3 py-1 rounded-md text-slate-300 hover:text-white">FIND-S Simulator</button>
+          <button onclick="switchLabTab('tester')" id="tabBtnTester" class="px-3 py-1 rounded-md text-slate-300 hover:text-white">Instance Matcher</button>
+        </div>
+        <button onclick="closePlayground()" class="text-slate-400 hover:text-white p-2 text-xl">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="p-6 overflow-y-auto flex-1 bg-slate-50">
+      
+      <!-- TAB 1: Candidate Elimination & Version Space -->
+      <div id="labTabCE" class="space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Left: Training Examples Control -->
+          <div class="lg:col-span-5 bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex justify-between items-center border-b pb-3 border-slate-100">
+              <h3 class="font-bold text-sm text-auNavy uppercase tracking-wide flex items-center gap-2">
+                <i class="fa-solid fa-list-check text-auOrange"></i> Training Data Instances
+              </h3>
+              <button onclick="resetCEDataset()" class="text-xs text-auOrange font-semibold hover:underline">Reset Default</button>
+            </div>
+
+            <!-- Instances List -->
+            <div id="ceInstancesList" class="space-y-2 max-h-[280px] overflow-y-auto pr-1">
+              <!-- Rendered via JS -->
+            </div>
+
+            <!-- Add Instance Form -->
+            <div class="pt-3 border-t border-slate-100 space-y-3">
+              <h4 class="text-xs font-bold text-slate-600 uppercase">Add New Training Example:</h4>
+              <div class="grid grid-cols-3 gap-2 text-xs">
+                <div>
+                  <label class="block text-slate-500 mb-1">Sky</label>
+                  <select id="addSky" class="w-full bg-slate-50 border rounded p-1 font-mono">
+                    <option value="Sunny">Sunny</option>
+                    <option value="Rainy">Rainy</option>
+                    <option value="Cloudy">Cloudy</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-500 mb-1">AirTemp</label>
+                  <select id="addTemp" class="w-full bg-slate-50 border rounded p-1 font-mono">
+                    <option value="Warm">Warm</option>
+                    <option value="Cold">Cold</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-500 mb-1">Humidity</label>
+                  <select id="addHum" class="w-full bg-slate-50 border rounded p-1 font-mono">
+                    <option value="Normal">Normal</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-500 mb-1">Wind</label>
+                  <select id="addWind" class="w-full bg-slate-50 border rounded p-1 font-mono">
+                    <option value="Strong">Strong</option>
+                    <option value="Weak">Weak</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-500 mb-1">Water</label>
+                  <select id="addWater" class="w-full bg-slate-50 border rounded p-1 font-mono">
+                    <option value="Warm">Warm</option>
+                    <option value="Cool">Cool</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-slate-500 mb-1">Forecast</label>
+                  <select id="addForecast" class="w-full bg-slate-50 border rounded p-1 font-mono">
+                    <option value="Same">Same</option>
+                    <option value="Change">Change</option>
+                  </select>
+                </div>
+              </div>
+              <div class="flex gap-2 pt-1">
+                <select id="addTarget" class="bg-slate-100 border rounded px-2 py-1 text-xs font-bold">
+                  <option value="Yes">Label: YES (+)</option>
+                  <option value="No">Label: NO (-)</option>
+                </select>
+                <button onclick="addCEInstance()" class="flex-1 bg-auNavy hover:bg-auNavyLight text-white py-1 rounded text-xs font-bold transition">
+                  Add Instance
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Boundaries & Version Space Lattice Visualization -->
+          <div class="lg:col-span-7 space-y-4">
+            <!-- Boundaries Box -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+              <h3 class="font-bold text-sm text-auNavy uppercase tracking-wide flex items-center gap-2">
+                <i class="fa-solid fa-arrows-left-right-to-line text-auOrange"></i> Boundary Sets ($S$ and $G$)
+              </h3>
+
+              <!-- General Boundary G -->
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1">
+                <div class="flex justify-between items-center text-xs font-bold text-auOrange">
+                  <span>MOST GENERAL BOUNDARY $G$</span>
+                  <span class="text-[10px] text-slate-500 font-normal">Pushed Specific by (-) Instances</span>
+                </div>
+                <div id="boundaryGDisplay" class="font-mono text-xs text-auNavy bg-white p-2.5 rounded border border-slate-200 overflow-x-auto min-h-[38px] flex items-center flex-wrap gap-2">
+                  <!-- Rendered G -->
+                </div>
+              </div>
+
+              <!-- Specific Boundary S -->
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-1">
+                <div class="flex justify-between items-center text-xs font-bold text-auNavy">
+                  <span>MOST SPECIFIC BOUNDARY $S$</span>
+                  <span class="text-[10px] text-slate-500 font-normal">Generalized by (+) Instances</span>
+                </div>
+                <div id="boundarySDisplay" class="font-mono text-xs text-auNavy bg-white p-2.5 rounded border border-slate-200 overflow-x-auto min-h-[38px] flex items-center">
+                  <!-- Rendered S -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Version Space Lattice Box -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+              <div class="flex justify-between items-center">
+                <h3 class="font-bold text-sm text-auNavy uppercase tracking-wide">Version Space Lattice</h3>
+                <span class="text-xs text-slate-500 font-mono" id="vsCountText">Consistent Hypotheses: 0</span>
+              </div>
+              <p class="text-xs text-slate-600">
+                Hypotheses bounded between <strong class="text-auNavy">$S$</strong> and <strong class="text-auOrange">$G$</strong> form the current consistent Version Space $VS_{H,D}$.
+              </p>
+              
+              <div id="vsLatticeVisual" class="bg-slate-900 rounded-xl p-4 min-h-[140px] flex flex-col justify-between items-center text-white relative">
+                <!-- Dynamic Lattice Diagram -->
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 2: FIND-S Simulator -->
+      <div id="labTabFindS" class="hidden space-y-6">
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <h3 class="font-bold text-base text-auNavy flex items-center gap-2">
+            <i class="fa-solid fa-arrow-down-short-wide text-auOrange"></i> Step-by-Step FIND-S Execution Trace
+          </h3>
+          <p class="text-xs text-slate-600">
+            FIND-S starts with the most specific hypothesis $h = \langle \varnothing, \varnothing, \varnothing, \varnothing, \varnothing, \varnothing \rangle$ and generalizes it for every <strong>positive example (+)</strong>. Negative examples are ignored.
+          </p>
+
+          <div class="flex items-center gap-3 py-2 border-y border-slate-100">
+            <button onclick="stepFindS(0)" class="bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs px-3 py-1.5 rounded font-bold">Start / Reset</button>
+            <button onclick="stepFindS(findSStep + 1)" class="bg-auOrange hover:bg-auOrangeHover text-white text-xs px-4 py-1.5 rounded font-bold flex items-center gap-1">
+              <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <span id="findSStepLabel" class="text-xs font-mono font-bold text-auNavy ml-auto">Step 0 / 4</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+            <!-- Current Instance -->
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-2">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Current Training Example $x_t$:</span>
+              <div id="findSCurrentInst" class="font-mono text-xs p-3 bg-white rounded border border-slate-200 text-auNavy">
+                <!-- Current instance details -->
+              </div>
+              <p id="findSActionNote" class="text-xs text-slate-600 italic">
+                Press "Next Step" to process the first instance.
+              </p>
+            </div>
+
+            <!-- Current Hypothesis h -->
+            <div class="bg-auNavy p-4 rounded-lg text-white space-y-2">
+              <span class="text-xs font-bold text-auOrange uppercase tracking-wider block">Learned Specific Hypothesis $h$:</span>
+              <div id="findSHypothesis" class="font-mono text-sm p-3 bg-auNavyLight rounded border border-white/20 text-white font-bold tracking-wide">
+                $\langle \varnothing, \varnothing, \varnothing, \varnothing, \varnothing, \varnothing \rangle$
+              </div>
+              <div class="text-[11px] text-slate-300 leading-tight">
+                Constraints are relaxed to <span class="font-mono text-auOrange font-bold">$?$</span> only when positive instances conflict with current attribute constraints.
+              </div>
+            </div>
+          </div>
+
+          <!-- Trace Table -->
+          <div class="pt-4">
+            <h4 class="text-xs font-bold text-slate-700 uppercase mb-2">Algorithm Execution History:</h4>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-100 border-b border-slate-200 text-slate-700 font-bold">
+                    <th class="p-2.5">Step</th>
+                    <th class="p-2.5">Instance Attributes</th>
+                    <th class="p-2.5">Label</th>
+                    <th class="p-2.5">Action Taken</th>
+                    <th class="p-2.5">Resulting Hypothesis $h$</th>
+                  </tr>
+                </thead>
+                <tbody id="findSTraceBody" class="font-mono text-slate-700 divide-y divide-slate-100">
+                  <!-- Dynamic Trace Rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 3: Instance Matcher & Generality Tester -->
+      <div id="labTabTester" class="hidden space-y-6">
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <h3 class="font-bold text-base text-auNavy flex items-center gap-2">
+            <i class="fa-solid fa-filter text-auOrange"></i> Hypothesis Matcher & Generality Evaluator
+          </h3>
+          <p class="text-xs text-slate-600">
+            Test whether an arbitrary hypothesis $h$ satisfies instance $x$ (i.e. whether $h(x) = 1$) and compute its relative generality.
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Hypothesis Input -->
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
+              <h4 class="text-xs font-bold text-auNavy uppercase">Define Hypothesis $h$:</h4>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span class="text-slate-500 block mb-0.5">Sky</span>
+                  <select id="testHSky" onchange="evaluateMatch()" class="w-full bg-white border rounded p-1 font-mono">
+                    <option value="?">? (Any)</option>
+                    <option value="Sunny">Sunny</option>
+                    <option value="Rainy">Rainy</option>
+                  </select>
+                </div>
+                <div>
+                  <span class="text-slate-500 block mb-0.5">AirTemp</span>
+                  <select id="testHTemp" onchange="evaluateMatch()" class="w-full bg-white border rounded p-1 font-mono">
+                    <option value="Warm">Warm</option>
+                    <option value="?">? (Any)</option>
+                    <option value="Cold">Cold</option>
+                  </select>
+                </div>
+                <div>
+                  <span class="text-slate-500 block mb-0.5">Humidity</span>
+                  <select id="testHHum" onchange="evaluateMatch()" class="w-full bg-white border rounded p-1 font-mono">
+                    <option value="?">? (Any)</option>
+                    <option value="Normal">Normal</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+                <div>
+                  <span class="text-slate-500 block mb-0.5">Wind</span>
+                  <select id="testHWind" onchange="evaluateMatch()" class="w-full bg-white border rounded p-1 font-mono">
+                    <option value="?">? (Any)</option>
+                    <option value="Strong">Strong</option>
+                    <option value="Weak">Weak</option>
+                  </select>
+                </div>
+              </div>
+              <div class="p-2 bg-auNavy text-white rounded font-mono text-xs text-center" id="testHDisplay">
+                $h = \langle ?, \text{Warm}, ?, ? \rangle$
+              </div>
+            </div>
+
+            <!-- Instance Input -->
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
+              <h4 class="text-xs font-bold text-auNavy uppercase">Define Instance $x$:</h4>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span class="text-slate-500 block mb-0.5">Sky</span>
+                  <select id="testXSky" onchange="evaluateMatch()" class="w-full bg-white border rounded p-1 font-mono">
+                    <option value="Sunny">Sunny</option>
+                    <option value="Rainy">Rainy</option>
+                  </select>
+                </div>
+                <div>
+                  <span class="text-slate-500 block mb-0.5">AirTemp</span>
+                  <select id="testXTemp" onchange="evaluateMatch()" class="w-full bg-white border rounded p-1 font-mono">
+                    <option value="Warm">Warm</option>
+                    <option value="Cold">Cold</option>
+                  </select>
+                </div>
+                <div>
+                  <span class="text-slate-500 block mb-0.5">Humidity</span>
+                  <select id="testXHum" onchange="evaluateMatch()" class="w-full bg-white border rounded p-1 font-mono">
+                    <option value="Normal">Normal</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+                <div>
+                  <span class="text-slate-500 block mb-0.5">Wind</span>
+                  <select id="testXWind" onchange="evaluateMatch()" class="w-full bg-white border rounded p-1 font-mono">
+                    <option value="Strong">Strong</option>
+                    <option value="Weak">Weak</option>
+                  </select>
+                </div>
+              </div>
+              <div class="p-2 bg-slate-800 text-white rounded font-mono text-xs text-center" id="testXDisplay">
+                $x = \langle \text{Sunny}, \text{Warm}, \text{Normal}, \text{Strong} \rangle$
+              </div>
+            </div>
+          </div>
+
+          <!-- Evaluation Result -->
+          <div id="matchResultBox" class="p-4 rounded-xl border text-center font-bold text-sm transition">
+            <!-- Match Result rendered via JS -->
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="bg-slate-100 px-6 py-3 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
+      <span>Aditya University • School of Computing • Department of AIML</span>
+      <button onclick="closePlayground()" class="px-4 py-1.5 bg-slate-800 text-white font-bold rounded-lg hover:bg-slate-900">Close Lab</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// LECTURE CONTENT DATABASE WITH MATHJAX TEX FORMULAS AND VERBATIM PRESENTER SCRIPTS
+const slidesData = [
+  // SLIDE 1: Welcome & Objectives
+  {
+    title: "Welcome & Chapter Overview",
+    kicker: "MODULE 01 • Introduction to Concept Learning",
+    content: `
+      <div class="space-y-6">
+        <p class="text-base text-slate-700 leading-relaxed">
+          Welcome to Chapter 2 of Machine Learning. Today, we delve into <strong>Concept Learning</strong> and the structural foundation of learning algorithms through <strong>General-to-Specific Ordering</strong>.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <h3 class="font-bold text-sm text-auNavy uppercase flex items-center gap-2">
+              <i class="fa-solid fa-bullseye text-auOrange"></i> Key Learning Objectives
+            </h3>
+            <ul class="list-disc list-inside text-xs text-slate-600 space-y-1.5">
+              <li>Formulate concept learning as a search problem through hypothesis spaces.</li>
+              <li>Understand the partial order structure $\\ge_g$ over hypothesis spaces.</li>
+              <li>Master the FIND-S and Candidate-Elimination algorithms.</li>
+              <li>Define Version Spaces ($VS_{H,D}$) using Boundary Sets $S$ and $G$.</li>
+              <li>Analyze Inductive Bias and why unbiased learning is fundamentally impossible.</li>
+            </ul>
+          </div>
+
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <h3 class="font-bold text-sm text-auNavy uppercase flex items-center gap-2">
+              <i class="fa-solid fa-book-bookmark text-auOrange"></i> Required Reading
+            </h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Tom M. Mitchell, <em>Machine Learning</em>, Chapter 2: "Concept Learning and the General-to-Specific Ordering".
+            </p>
+            <div class="p-3 bg-auNavy text-white rounded-lg text-xs font-mono mt-2">
+              Prerequisites: Basic set theory, discrete mathematics, and Boolean logic.
+            </div>
+          </div>
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed italic">
+        "Good morning everyone! Welcome back. Today we are diving into Chapter 2 of Tom Mitchell's textbook. Up until now, we've talked about machine learning conceptually. Today, we start looking at our first formal machine learning paradigm: <strong>Concept Learning</strong>."
+      </p>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed">
+        "By the end of this lecture, you will understand how learning can be viewed as searching through a space of hypotheses, how we structure that space using partial orders, and why every learning algorithm must carry an inductive bias to generalize to unseen data."
+      </p>
+      <span class="bg-auNavy text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded mt-3 block">BOARD NOTE</span>
+      <p class="text-xs text-slate-600">Write on board: <em>Learning = Search through Hypothesis Space $H$</em>.</p>
+    `
+  },
+
+  // SLIDE 2: What is Concept Learning?
+  {
+    title: "What is Concept Learning?",
+    kicker: "MODULE 02 • Core Definitions",
+    content: `
+      <div class="space-y-6">
+        <p class="text-base text-slate-700 leading-relaxed">
+          Human learning frequently involves acquiring general concepts from specific instances. In machine learning, a <strong>concept</strong> is a Boolean-valued function defined over a set of instances.
+        </p>
+
+        <div class="bg-slate-50 border-l-4 border-auOrange p-5 rounded-r-xl border border-slate-200 space-y-2">
+          <span class="text-xs font-mono font-bold text-auOrange tracking-wider uppercase block">Definition: Concept Learning</span>
+          <p class="text-sm font-medium text-auNavy">
+            Inferring a Boolean-valued function $c: X \\rightarrow \\{0, 1\\}$ from a set of training examples containing input attributes and target values.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1">
+            <span class="font-bold text-auNavy block">1. Concept Domain</span>
+            <span class="text-slate-600">The underlying category or subset of objects being learned (e.g., "Days I want to play water sports").</span>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1">
+            <span class="font-bold text-auOrange block">2. Target Concept $c(x)$</span>
+            <span class="text-slate-600">The true function where $c(x)=1$ if $x$ belongs to the concept, and $c(x)=0$ otherwise.</span>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1">
+            <span class="font-bold text-auNavy block">3. Training Instances $D$</span>
+            <span class="text-slate-600">Pairs $\\langle x, c(x) \\rangle$ provided to the learning algorithm as positive (+) or negative (-) examples.</span>
+          </div>
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed italic">
+        "Think about how a child learns what a 'car' is. They see examples of sedans, trucks, and SUVs with the label 'car', and non-examples like bicycles or birds labeled 'not a car'. Over time, the child infers a general rule."
+      </p>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed">
+        "Formally, we treat this concept as a Boolean target function $c(x)$. If an item belongs to the concept, $c(x) = 1$. If not, $c(x) = 0$. Our task as machine learning engineers is to design algorithms that automatically discover this hidden function $c$ using only observed training pairs."
+      </p>
+    `
+  },
+
+  // SLIDE 3: The EnjoySport Domain
+  {
+    title: "The Illustrative Problem: EnjoySport",
+    kicker: "MODULE 03 • Canonical Domain Setup",
+    content: `
+      <div class="space-y-5">
+        <p class="text-base text-slate-700 leading-relaxed">
+          Throughout Mitchell Chapter 2, we use the <strong>EnjoySport</strong> benchmark task: predicting whether a person will enjoy water sports on a given day based on weather conditions.
+        </p>
+
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="bg-auNavy px-4 py-2 text-white text-xs font-bold uppercase tracking-wider flex justify-between">
+            <span>EnjoySport Training Dataset ($D$)</span>
+            <span class="text-auOrange">Target $c(x): \\text{EnjoySport?}$</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-slate-100 text-slate-700 font-bold border-b">
+                <tr>
+                  <th class="p-2.5">Example</th>
+                  <th class="p-2.5">Sky</th>
+                  <th class="p-2.5">AirTemp</th>
+                  <th class="p-2.5">Humidity</th>
+                  <th class="p-2.5">Wind</th>
+                  <th class="p-2.5">Water</th>
+                  <th class="p-2.5">Forecast</th>
+                  <th class="p-2.5">EnjoySport ($c(x)$)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 font-mono">
+                <tr>
+                  <td class="p-2.5 font-bold text-auNavy">$x_1$</td>
+                  <td class="p-2.5">Sunny</td><td class="p-2.5">Warm</td><td class="p-2.5">Normal</td><td class="p-2.5">Strong</td><td class="p-2.5">Warm</td><td class="p-2.5">Same</td>
+                  <td class="p-2.5"><span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">YES (+)</span></td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold text-auNavy">$x_2$</td>
+                  <td class="p-2.5">Sunny</td><td class="p-2.5">Warm</td><td class="p-2.5">High</td><td class="p-2.5">Strong</td><td class="p-2.5">Warm</td><td class="p-2.5">Same</td>
+                  <td class="p-2.5"><span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">YES (+)</span></td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold text-auNavy">$x_3$</td>
+                  <td class="p-2.5">Rainy</td><td class="p-2.5">Cold</td><td class="p-2.5">High</td><td class="p-2.5">Strong</td><td class="p-2.5">Warm</td><td class="p-2.5">Change</td>
+                  <td class="p-2.5"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded">NO (-)</span></td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold text-auNavy">$x_4$</td>
+                  <td class="p-2.5">Sunny</td><td class="p-2.5">Warm</td><td class="p-2.5">High</td><td class="p-2.5">Strong</td><td class="p-2.5">Cool</td><td class="p-2.5">Change</td>
+                  <td class="p-2.5"><span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">YES (+)</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <p class="text-xs text-slate-600 italic">
+          Notice how attributes are discrete-valued. Each example consists of 6 weather features.
+        </p>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed italic">
+        "Let's ground our discussion with a classic example from the Mitchell textbook: the <strong>EnjoySport</strong> domain."
+      </p>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed">
+        "Look at this dataset on the slide. Every morning, we record 6 weather attributes: Sky, Air Temperature, Humidity, Wind, Water Temperature, and Forecast. Then we observe whether the person enjoyed water sports that day—Yes or No."
+      </p>
+    `
+  },
+
+  // SLIDE 4: Formal Task Definition
+  {
+    title: "Formal Notation & Task Statement",
+    kicker: "MODULE 04 • Mathematical Formulation",
+    content: `
+      <div class="space-y-6">
+        <p class="text-base text-slate-700 leading-relaxed">
+          To build algorithms rigorously, we formalize the components of the concept learning task using mathematical set notation.
+        </p>
+
+        <div class="bg-slate-900 text-white p-5 rounded-xl space-y-3 font-mono text-xs shadow-md">
+          <div class="text-auOrange font-bold border-b border-white/10 pb-2">
+            FORMAL CONCEPT LEARNING TASK SPECIFICATION
+          </div>
+          <div class="space-y-2 text-slate-300">
+            <div><strong class="text-white">Given:</strong></div>
+            <ul class="list-disc list-inside pl-4 space-y-1">
+              <li>Instance Space $X$: Set of items over which target concept is defined.</li>
+              <li>Target Concept $c: X \\rightarrow \\{0, 1\\}$: The unknown true function.</li>
+              <li>Training Examples $D$: Instances $x$ with target values $c(x)$: $\\big\\{ \\langle x_i, c(x_i) \\rangle \\big\\}$.</li>
+              <li>Hypothesis Space $H$: Set of all candidate functions $h: X \\rightarrow \\{0, 1\\}$.</li>
+            </ul>
+            <div class="pt-2 border-t border-white/10"><strong class="text-white">Goal:</strong></div>
+            <div class="pl-4 text-emerald-400 font-bold">
+              Find a hypothesis $h \\in H$ such that $h(x) = c(x)$ for all $x \\in X$.
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700">
+          <strong class="text-auNavy block mb-1">Crucial Insight:</strong>
+          The inductive learning hypothesis states that any hypothesis found to approximate the target function well over a sufficiently large set of training examples will also approximate the target function well over unseen examples.
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed italic">
+        "Let's formalize what we just saw. Write these four components down in your notebook: $X$, $c$, $D$, and $H$."
+      </p>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed font-semibold">
+        "Notice our goal: we don't just want $h(x) = c(x)$ on the training data $D$. We want $h(x) = c(x)$ across the ENTIRE instance space $X$, including future unseen days!"
+      </p>
+    `
+  },
+
+  // SLIDE 5: Combinatorics
+  {
+    title: "Combinatorics: $|X|$ vs. $|H|$",
+    kicker: "MODULE 05 • Space Complexity Analysis",
+    content: `
+      <div class="space-y-6">
+        <p class="text-base text-slate-700 leading-relaxed">
+          Before designing search algorithms, we must quantify the search space. How large are the Instance Space $X$ and the Hypothesis Space $H$?
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex items-center gap-2 text-auNavy font-bold text-sm uppercase">
+              <i class="fa-solid fa-calculator text-auOrange"></i> Instance Space Size $|X|$
+            </div>
+            <p class="text-xs text-slate-600">
+              Calculated by multiplying the number of possible values for each of the 6 attributes:
+            </p>
+            <div class="math-block p-4 rounded-lg text-xs space-y-2">
+              <div>$$\\text{Sky}(3) \\times \\text{Temp}(2) \\times \\text{Hum}(2) \\times \\text{Wind}(2) \\times \\text{Water}(2) \\times \\text{Fcst}(2)$$</div>
+              <div class="text-auOrange font-bold text-sm text-center">$$|X| = 3 \\times 2 \\times 2 \\times 2 \\times 2 \\times 2 = 96$$</div>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="flex items-center gap-2 text-auNavy font-bold text-sm uppercase">
+              <i class="fa-solid fa-diagram-project text-auOrange"></i> Hypothesis Space Size $|H|$
+            </div>
+            <p class="text-xs text-slate-600">
+              Each attribute in a conjunction allows explicit values plus wildcard $?$ and null $\\varnothing$:
+            </p>
+            <div class="math-block p-4 rounded-lg text-xs space-y-1">
+              <div>$$\\text{Syntactic}: 5 \\times 3 \\times 3 \\times 3 \\times 3 \\times 3 = 1{,}215$$</div>
+              <div class="text-auOrange font-bold text-sm text-center">$$\\text{Semantic}: |H| = 1 + (4 \\times 2^5) = 973$$</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl border border-amber-200 text-xs text-amber-900">
+          <strong>Syntactic vs. Semantic Distinction:</strong> Any hypothesis containing one or more null constraints $\\varnothing$ accepts zero instances. Syntactically there are many such hypotheses, but semantically they represent the exact same empty function!
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed italic">
+        "Let's do some math together. How many distinct days can exist in our EnjoySport world? $3 \\times 2^5 = 96$ total instances."
+      </p>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed">
+        "And semantically, there are $1 + (4 \\times 2^5) = 973$ distinct hypotheses."
+      </p>
+    `
+  },
+
+  // SLIDE 6: Expressing Hypotheses
+  {
+    title: "Hypothesis Representation Language",
+    kicker: "MODULE 06 • Constraint Representations",
+    content: `
+      <div class="space-y-6">
+        <p class="text-base text-slate-700 leading-relaxed">
+          A hypothesis $h$ is expressed as a vector of constraints on the domain attributes: $h = \\langle a_1, a_2, a_3, a_4, a_5, a_6 \\rangle$.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <span class="font-bold text-auOrange text-sm font-mono block">1. Wildcard Constraint (?)</span>
+            <p class="text-slate-600">Indicates that <em>any</em> value is acceptable for this attribute.</p>
+            <div class="bg-slate-100 p-2 rounded font-mono text-[11px]">
+              $\\langle ?, \\text{Warm}, ?, ?, ?, ? \\rangle$
+            </div>
+          </div>
+
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <span class="font-bold text-auNavy text-sm font-mono block">2. Explicit Value Constraint</span>
+            <p class="text-slate-600">Requires a specific attribute value to be matched exactly.</p>
+            <div class="bg-slate-100 p-2 rounded font-mono text-[11px]">
+              $\\langle \\text{Sunny}, \\text{Warm}, ?, \\text{Strong}, ?, ? \\rangle$
+            </div>
+          </div>
+
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <span class="font-bold text-rose-600 text-sm font-mono block">3. Null Constraint ($\\varnothing$)</span>
+            <p class="text-slate-600">Rejects all instances; no value is acceptable for this attribute.</p>
+            <div class="bg-slate-100 p-2 rounded font-mono text-[11px]">
+              $\\langle \\varnothing, \\varnothing, \\varnothing, \\varnothing, \\varnothing, \\varnothing \\rangle$
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 border-l-4 border-auNavy p-5 rounded-r-xl border border-slate-200 space-y-2">
+          <span class="text-xs font-mono font-bold text-auNavy uppercase block">Sample Hypothesis Evaluation</span>
+          <p class="text-xs text-slate-700 leading-relaxed">
+            Hypothesis $h = \\langle \\text{Sunny}, ?, ?, \\text{Strong}, ?, ? \\rangle$ classifies instance $x_1 = \\langle \\text{Sunny}, \\text{Warm}, \\text{Normal}, \\text{Strong}, \\text{Warm}, \\text{Same} \\rangle$ as <strong>Positive (1)</strong> because $x_1$ satisfies all constraints in $h$.
+          </p>
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed italic">
+        "We represent a hypothesis as a 6-tuple enclosed in angle brackets. Inside, each position corresponds to one attribute."
+      </p>
+    `
+  },
+
+  // SLIDE 7: General-to-Specific Ordering
+  {
+    title: "General-to-Specific Partial Ordering ($\\ge_g$)",
+    kicker: "MODULE 07 • Structural Ordering Relation",
+    content: `
+      <div class="space-y-6">
+        <p class="text-base text-slate-700 leading-relaxed">
+          Concept learning algorithms avoid searching $H$ exhaustively by exploiting the <strong>more-general-than-or-equal-to</strong> relation ($\\ge_g$).
+        </p>
+
+        <div class="bg-slate-50 border-l-4 border-auOrange p-5 rounded-r-xl border border-slate-200 space-y-2">
+          <span class="text-xs font-mono font-bold text-auOrange tracking-wider uppercase block">Formal Definition: $\\ge_g$ Relation</span>
+          <p class="text-sm font-medium text-auNavy">
+            Let $h_j$ and $h_k$ be Boolean functions on $X$. $h_j$ is <strong>more general than or equal to</strong> $h_k$ ($h_j \\ge_g h_k$) if and only if every instance that satisfies $h_k$ also satisfies $h_j$:
+          </p>
+          <div class="font-mono text-xs text-auOrange font-bold pt-2">
+            $$h_j \\ge_g h_k \\iff \\forall x \\in X : \\big( h_k(x) = 1 \\implies h_j(x) = 1 \\big)$$
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2 shadow-sm">
+            <span class="font-bold text-emerald-700 uppercase block">Comparable Example ($h_1 \\ge_g h_2$)</span>
+            <div class="font-mono text-[11px] space-y-1">
+              <div>$h_1 = \\langle \\text{Sunny}, ?, ?, ?, ?, ? \\rangle$</div>
+              <div>$h_2 = \\langle \\text{Sunny}, \\text{Warm}, ?, ?, ?, ? \\rangle$</div>
+            </div>
+            <p class="text-slate-600 pt-1">
+              $h_1$ is strictly more general than $h_2$ because $h_1$ imposes fewer constraints.
+            </p>
+          </div>
+
+          <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2 shadow-sm">
+            <span class="font-bold text-rose-700 uppercase block">Incomparable Example ($h_3 \\not\\ge_g h_2$)</span>
+            <div class="font-mono text-[11px] space-y-1">
+              <div>$h_3 = \\langle ?, ?, ?, \\text{Strong}, ?, ? \\rangle$</div>
+              <div>$h_2 = \\langle \\text{Sunny}, \\text{Warm}, ?, ?, ?, ? \\rangle$</div>
+            </div>
+            <p class="text-slate-600 pt-1">
+              Neither $h_3 \\ge_g h_2$ nor $h_2 \\ge_g h_3$ holds. They constrain different attributes!
+            </p>
+          </div>
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed italic">
+        "This is why $\\ge_g$ is a PARTIAL order, not a total order."
+      </p>
+    `
+  },
+
+  // SLIDE 8: Partial Order & Hypothesis Lattice
+  {
+    title: "Hypothesis Space as a Lattice",
+    kicker: "MODULE 08 • Structural Properties of H",
+    content: `
+      <div class="space-y-6">
+        <p class="text-base text-slate-700 leading-relaxed">
+          The partial ordering $\\ge_g$ organizes the hypothesis space $H$ into a hierarchical <strong>lattice structure</strong> bounded by the most general and most specific hypotheses.
+        </p>
+
+        <div class="bg-slate-900 text-white p-5 rounded-xl space-y-4 shadow-md text-center">
+          <div class="text-auOrange font-bold text-xs font-mono uppercase tracking-wider">
+            HYPOTHESIS LATTICE STRUCTURE
+          </div>
+
+          <div class="space-y-3 font-mono text-xs">
+            <div class="inline-block bg-auOrange/20 border border-auOrange text-auOrange px-4 py-1.5 rounded-lg font-bold">
+              Most General: $h_G = \\langle ?, ?, ?, ?, ?, ? \\rangle$ (Accepts ALL instances)
+            </div>
+            <div class="text-slate-500"><i class="fa-solid fa-arrow-down-long"></i> Decreasing Generality (Adding Constraints) <i class="fa-solid fa-arrow-down-long"></i></div>
+            <div class="flex justify-center gap-2 flex-wrap">
+              <span class="bg-slate-800 border border-slate-700 px-2 py-1 rounded">$\\langle \\text{Sunny}, ?, ?, ?, ?, ? \\rangle$</span>
+              <span class="bg-slate-800 border border-slate-700 px-2 py-1 rounded">$\\langle ?, \\text{Warm}, ?, ?, ?, ? \\rangle$</span>
+              <span class="bg-slate-800 border border-slate-700 px-2 py-1 rounded">$\\langle ?, ?, ?, \\text{Strong}, ?, ? \\rangle$</span>
+            </div>
+            <div class="text-slate-500"><i class="fa-solid fa-arrow-down-long"></i></div>
+            <div class="inline-block bg-emerald-500/20 border border-emerald-400 text-emerald-300 px-4 py-1.5 rounded-lg font-bold">
+              Most Specific: $h_S = \\langle \\varnothing, \\varnothing, \\varnothing, \\varnothing, \\varnothing, \\varnothing \\rangle$ (Accepts NO instances)
+            </div>
+          </div>
+        </div>
+
+        <p class="text-xs text-slate-600 leading-relaxed">
+          This lattice structure enables top-down (specialization) and bottom-up (generalization) search algorithms without needing to test every hypothesis individually.
+        </p>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed">
+        "At the absolute top sits $h_G$, and at the absolute bottom sits $h_S$. Moving down specializes hypotheses."
+      </p>
+    `
+  },
+
+  // SLIDE 9: FIND-S Algorithm Mechanics
+  {
+    title: "FIND-S: Maximally Specific Learning",
+    kicker: "MODULE 09 • Bottom-Up Search Algorithm",
+    content: `
+      <div class="space-y-5">
+        <p class="text-base text-slate-700 leading-relaxed">
+          <strong>FIND-S</strong> is a bottom-up algorithm that searches for the most specific hypothesis consistent with all positive training examples in $D$.
+        </p>
+
+        <div class="bg-slate-900 text-white p-5 rounded-xl space-y-3 font-mono text-xs shadow-md">
+          <div class="text-auOrange font-bold border-b border-white/10 pb-2 flex justify-between">
+            <span>FIND-S ALGORITHM SPECIFICATION</span>
+            <span>Mitchell Ch 2.4</span>
+          </div>
+          <ol class="list-decimal list-inside space-y-2 text-slate-300">
+            <li>Initialize $h \\leftarrow \\langle \\varnothing, \\varnothing, \\varnothing, \\varnothing, \\varnothing, \\varnothing \\rangle$.</li>
+            <li>For each positive training instance $x$:
+              <ul class="list-disc list-inside pl-4 pt-1 space-y-1 text-slate-400">
+                <li>For each attribute constraint $a_i$ in $h$:</li>
+                <li>If $a_i$ is satisfied by $x$, do nothing.</li>
+                <li>Else, replace $a_i$ with the next more general constraint satisfied by $x$.</li>
+              </ul>
+            </li>
+            <li>Ignore all negative training instances $x (-)$.</li>
+            <li>Return hypothesis $h$.</li>
+          </ol>
+        </div>
+
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-700">
+          <strong class="text-auNavy block mb-1">Why start at $\\langle \\varnothing, \\varnothing, \\varnothing, \\varnothing, \\varnothing, \\varnothing \\rangle$?</strong>
+          Starting at the most specific point guarantees that $h$ is generalized ONLY when required by positive evidence, preserving maximum specificity.
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed">
+        "Whenever FIND-S sees a positive example, it relaxes constraints to wildcards $?$ if needed. Negative examples are ignored."
+      </p>
+    `
+  },
+
+  // SLIDE 10: FIND-S Step-by-Step
+  {
+    title: "FIND-S Execution Walkthrough",
+    kicker: "MODULE 10 • Algorithm Trace",
+    content: `
+      <div class="space-y-5">
+        <p class="text-base text-slate-700 leading-relaxed">
+          Let's trace FIND-S step-by-step on the 4 EnjoySport training instances:
+        </p>
+
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm text-xs">
+          <table class="w-full text-left font-mono">
+            <thead class="bg-slate-100 text-slate-700 font-bold border-b">
+              <tr>
+                <th class="p-2.5">Step</th>
+                <th class="p-2.5">Instance $x_i$</th>
+                <th class="p-2.5">Label</th>
+                <th class="p-2.5">Action & Reasoning</th>
+                <th class="p-2.5">Resulting Hypothesis $h$</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td class="p-2.5 font-bold">Init</td>
+                <td class="p-2.5">—</td>
+                <td class="p-2.5">—</td>
+                <td class="p-2.5 text-slate-500">Initialize to most specific</td>
+                <td class="p-2.5 font-bold text-auNavy font-mono">$\\langle \\varnothing, \\varnothing, \\varnothing, \\varnothing, \\varnothing, \\varnothing \\rangle$</td>
+              </tr>
+              <tr class="bg-emerald-50/50">
+                <td class="p-2.5 font-bold">1</td>
+                <td class="p-2.5">$\\langle \\text{Sunny}, \\text{Warm}, \\text{Normal}, \\text{Strong}, \\text{Warm}, \\text{Same} \\rangle$</td>
+                <td class="p-2.5"><span class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">+</span></td>
+                <td class="p-2.5">First positive example: replace all $\\varnothing$ with $x_1$ values</td>
+                <td class="p-2.5 font-bold text-auNavy">$\\langle \\text{Sunny}, \\text{Warm}, \\text{Normal}, \\text{Strong}, \\text{Warm}, \\text{Same} \\rangle$</td>
+              </tr>
+              <tr class="bg-emerald-50/50">
+                <td class="p-2.5 font-bold">2</td>
+                <td class="p-2.5">$\\langle \\text{Sunny}, \\text{Warm}, \\text{High}, \\text{Strong}, \\text{Warm}, \\text{Same} \\rangle$</td>
+                <td class="p-2.5"><span class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">+</span></td>
+                <td class="p-2.5">Humidity differs ($\\text{Normal} \\neq \\text{High}$): replace with $?$</td>
+                <td class="p-2.5 font-bold text-auNavy">$\\langle \\text{Sunny}, \\text{Warm}, ?, \\text{Strong}, \\text{Warm}, \\text{Same} \\rangle$</td>
+              </tr>
+              <tr class="bg-rose-50/50">
+                <td class="p-2.5 font-bold">3</td>
+                <td class="p-2.5">$\\langle \\text{Rainy}, \\text{Cold}, \\text{High}, \\text{Strong}, \\text{Warm}, \\text{Change} \\rangle$</td>
+                <td class="p-2.5"><span class="bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded font-bold">-</span></td>
+                <td class="p-2.5 text-rose-700">Negative example: ignore completely</td>
+                <td class="p-2.5 font-bold text-auNavy">$\\langle \\text{Sunny}, \\text{Warm}, ?, \\text{Strong}, \\text{Warm}, \\text{Same} \\rangle$</td>
+              </tr>
+              <tr class="bg-emerald-50/50">
+                <td class="p-2.5 font-bold">4</td>
+                <td class="p-2.5">$\\langle \\text{Sunny}, \\text{Warm}, \\text{High}, \\text{Strong}, \\text{Cool}, \\text{Change} \\rangle$</td>
+                <td class="p-2.5"><span class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-bold">+</span></td>
+                <td class="p-2.5">Water & Forecast differ: replace with $?$</td>
+                <td class="p-2.5 font-bold text-auOrange">$\\langle \\text{Sunny}, \\text{Warm}, ?, \\text{Strong}, ?, ? \\rangle$</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed font-semibold">
+        "Final learned hypothesis: $h = \\langle \\text{Sunny}, \\text{Warm}, ?, \\text{Strong}, ?, ? \\rangle$."
+      </p>
+    `
+  },
+
+  // SLIDE 11: Limitations of FIND-S
+  {
+    title: "Limitations & Shortcomings of FIND-S",
+    kicker: "MODULE 11 • Algorithmic Critique",
+    content: `
+      <div class="space-y-6">
+        <p class="text-base text-slate-700 leading-relaxed">
+          Although FIND-S is simple and guaranteed to output a maximally specific hypothesis consistent with positive data, it suffers from severe practical limitations.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <span class="font-bold text-rose-700 uppercase flex items-center gap-1.5">
+              <i class="fa-solid fa-triangle-exclamation"></i> 1. Cannot Detect Multiple Consistent Hypotheses
+            </span>
+            <p class="text-slate-600">
+              FIND-S outputs only ONE hypothesis. It cannot tell whether it has converged uniquely to the true concept or if dozens of other consistent hypotheses exist.
+            </p>
+          </div>
+
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <span class="font-bold text-rose-700 uppercase flex items-center gap-1.5">
+              <i class="fa-solid fa-bug"></i> 2. Vulnerable to Noise and Errors
+            </span>
+            <p class="text-slate-600">
+              A single mislabeled positive example permanently over-generalizes $h$, corrupting the learned hypothesis forever.
+            </p>
+          </div>
+
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <span class="font-bold text-rose-700 uppercase flex items-center gap-1.5">
+              <i class="fa-solid fa-eye-slash"></i> 3. Ignores Negative Examples
+            </span>
+            <p class="text-slate-600">
+              By ignoring negative instances, FIND-S fails to check if its generalizations inadvertently cover negative instances!
+            </p>
+          </div>
+
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <span class="font-bold text-rose-700 uppercase flex items-center gap-1.5">
+              <i class="fa-solid fa-question"></i> 4. Disregards Disjunctive Concepts
+            </span>
+            <p class="text-slate-600">
+              If the true concept is a disjunction (e.g., "Sunny OR Warm"), FIND-S cannot represent it using single conjunctions.
+            </p>
+          </div>
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed italic">
+        "To fix these limitations, we need an algorithm that tracks the ENTIRE space of consistent hypotheses..."
+      </p>
+    `
+  },
+
+  // SLIDE 12: Candidate Consistency vs. Satisfying
+  {
+    title: "Satisfying vs. Consistency",
+    kicker: "MODULE 12 • Theoretical Foundations",
+    content: `
+      <div class="space-y-6">
+        <p class="text-base text-slate-700 leading-relaxed">
+          To transition from FIND-S to Version Spaces, we must formally distinguish between an instance <strong>satisfying</strong> a hypothesis versus a hypothesis being <strong>consistent</strong> with a dataset.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="text-auNavy font-bold text-sm uppercase">
+              Satisfies (Single Instance $x$)
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              An instance $x$ <strong>satisfies</strong> hypothesis $h$ if and only if $h(x) = 1$. This is purely structural and ignores target label $c(x)$.
+            </p>
+            <div class="math-block p-3 rounded text-xs">
+              $$\\text{Satisfies}(h, x) \\iff h(x) = 1$$
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="text-auOrange font-bold text-sm uppercase">
+              Consistent (Full Dataset $D$)
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              A hypothesis $h$ is <strong>consistent</strong> with dataset $D$ if $h(x) = c(x)$ for every training pair $\\langle x, c(x) \\rangle \\in D$.
+            </p>
+            <div class="math-block p-3 rounded text-xs">
+              $$\\text{Consistent}(h, D) \\iff \\forall \\langle x, c(x) \\rangle \\in D : h(x) = c(x)$$
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 border-l-4 border-auNavy p-4 rounded-r-xl border border-slate-200 text-xs text-slate-700">
+          <strong>Key Difference:</strong> Consistency requires correct predictions on BOTH positive and negative instances!
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed">
+        "'Satisfies' ignores labels. 'Consistent' requires correct labels for ALL training examples!"
+      </p>
+    `
+  },
+
+  // SLIDE 13: Version Spaces
+  {
+    title: "Version Spaces & Boundary Sets ($S$ and $G$)",
+    kicker: "MODULE 13 • Compact Space Representation",
+    content: `
+      <div class="space-y-6">
+        <p class="text-base text-slate-700 leading-relaxed">
+          The <strong>Version Space</strong> $VS_{H,D}$ is the subset of ALL hypotheses in $H$ consistent with training dataset $D$.
+        </p>
+
+        <div class="bg-slate-50 border-l-4 border-auOrange p-5 rounded-r-xl border border-slate-200 space-y-3">
+          <span class="text-xs font-mono font-bold text-auNavy uppercase block">Definition: Version Space</span>
+          <div class="math-block p-4 rounded-lg text-xs space-y-2">
+            <div>$$VS_{H,D} = \\big\\{ h \\in H \\;\\mid\\; \\text{Consistent}(h, D) \\big\\}$$</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <span class="font-bold text-emerald-700 uppercase block">Specific Boundary Set ($S$)</span>
+            <p class="text-slate-600">
+              Set of <em>maximally specific</em> members of $H$ consistent with $D$.
+            </p>
+          </div>
+
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <span class="font-bold text-auOrange uppercase block">General Boundary Set ($G$)</span>
+            <p class="text-slate-600">
+              Set of <em>maximally general</em> members of $H$ consistent with $D$.
+            </p>
+          </div>
+        </div>
+
+        <div class="bg-auNavy text-white p-4 rounded-xl text-xs font-mono text-center">
+          <strong>The Version Space Representation Theorem:</strong> Every consistent hypothesis $h$ lies between $S$ and $G$: <br/>
+          <span class="text-auOrange">$$\\exists s \\in S, \\exists g \\in G : g \\ge_g h \\ge_g s$$</span>
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed italic">
+        "We represent the Version Space using just two boundaries: $S$ and $G$."
+      </p>
+    `
+  },
+
+  // SLIDE 14: Candidate-Elimination Mechanics
+  {
+    title: "Candidate-Elimination Algorithm Mechanics",
+    kicker: "MODULE 14 • Dual Boundary Refinement",
+    content: `
+      <div class="space-y-6">
+        <p class="text-base text-slate-700 leading-relaxed">
+          The <strong>Candidate-Elimination Algorithm</strong> incrementally computes the Version Space by refining $S$ and $G$ as each training example is observed.
+        </p>
+
+        <div class="bg-slate-900 text-white p-5 rounded-xl space-y-3 font-mono text-xs shadow-md">
+          <div class="text-auOrange font-bold border-b border-white/10 pb-2">
+            INITIALIZATION PHASE
+          </div>
+          <div class="space-y-2 text-slate-300">
+            <div>Initialize $S_0$ to the most specific boundary in $H$:</div>
+            <div class="text-emerald-400 font-bold pl-4">
+              $$S_0 \\leftarrow \\big\\{ \\langle \\varnothing, \\varnothing, \\varnothing, \\varnothing, \\varnothing, \\varnothing \\rangle \\big\\}$$
+            </div>
+            <div>Initialize $G_0$ to the most general boundary in $H$:</div>
+            <div class="text-auOrange font-bold pl-4">
+              $$G_0 \\leftarrow \\big\\{ \\langle ?, ?, ?, ?, ?, ? \\rangle \\big\\}$$
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 space-y-1">
+            <span class="font-bold text-emerald-800 block uppercase">Positive Example ($x (+)$)</span>
+            <p class="text-slate-700">
+              Pushes boundary $S$ <strong>UPWARD</strong> (generalized) to cover $x$. Prunes inconsistent candidates from $G$.
+            </p>
+          </div>
+          <div class="bg-rose-50 p-4 rounded-xl border border-rose-200 space-y-1">
+            <span class="font-bold text-rose-800 block uppercase">Negative Example ($x (-)$)</span>
+            <p class="text-slate-700">
+              Pushes boundary $G$ <strong>DOWNWARD</strong> (specialized) to exclude $x$. Prunes inconsistent candidates from $S$.
+            </p>
+          </div>
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed">
+        "Positive examples generalize $S$. Negative examples specialize $G$."
+      </p>
+    `
+  },
+
+  // SLIDE 15: Boundary Update Rules
+  {
+    title: "Candidate-Elimination Update Rules",
+    kicker: "MODULE 15 • Formal Update Specifications",
+    content: `
+      <div class="space-y-4 text-xs">
+        <!-- Positive Rule -->
+        <div class="bg-white p-4 rounded-xl border-t-4 border-emerald-500 border-x border-b border-slate-200 shadow-sm space-y-2">
+          <span class="font-bold text-emerald-800 uppercase tracking-wide block">Rule 1: On Positive Example $d = \\langle x, + \\rangle$</span>
+          <ul class="list-disc list-inside space-y-1 text-slate-600">
+            <li>Remove from $G$ any hypothesis inconsistent with $d$.</li>
+            <li>For each hypothesis $s \\in S$ not consistent with $d$:</li>
+            <li class="pl-4 text-slate-700">Remove $s$ from $S$.</li>
+            <li class="pl-4 text-slate-700">Add to $S$ all minimal generalizations $h$ of $s$ consistent with $d$ and dominated by some $g \\in G$.</li>
+            <li class="pl-4 text-slate-700">Remove from $S$ any hypothesis more general than another hypothesis in $S$.</li>
+          </ul>
+        </div>
+
+        <!-- Negative Rule -->
+        <div class="bg-white p-4 rounded-xl border-t-4 border-rose-500 border-x border-b border-slate-200 shadow-sm space-y-2">
+          <span class="font-bold text-rose-800 uppercase tracking-wide block">Rule 2: On Negative Example $d = \\langle x, - \\rangle$</span>
+          <ul class="list-disc list-inside space-y-1 text-slate-600">
+            <li>Remove from $S$ any hypothesis inconsistent with $d$.</li>
+            <li>For each hypothesis $g \\in G$ not consistent with $d$:</li>
+            <li class="pl-4 text-slate-700">Remove $g$ from $G$.</li>
+            <li class="pl-4 text-slate-700">Add to $G$ all minimal specializations $h$ of $g$ consistent with $d$ and dominating some $s \\in S$.</li>
+            <li class="pl-4 text-slate-700">Remove from $G$ any hypothesis more specific than another hypothesis in $G$.</li>
+          </ul>
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed italic">
+        "Note the dual constraints that keep $S$ below $G$ at all times!"
+      </p>
+    `
+  },
+
+  // SLIDE 16: Candidate-Elimination Trace
+  {
+    title: "Candidate-Elimination Step Trace",
+    kicker: "MODULE 16 • Step-by-Step Worked Example",
+    content: `
+      <div class="space-y-4 text-xs">
+        <p class="text-slate-700 leading-relaxed">
+          Tracking boundaries $S$ and $G$ through EnjoySport instances $x_1$ to $x_4$:
+        </p>
+
+        <div class="space-y-3 font-mono">
+          <div class="bg-slate-100 p-3 rounded-lg border border-slate-200">
+            <span class="font-bold text-auNavy block">Step 0: Initial State</span>
+            <div class="text-emerald-700">$S_0 = \\{ \\langle \\varnothing, \\varnothing, \\varnothing, \\varnothing, \\varnothing, \\varnothing \\rangle \\}$</div>
+            <div class="text-auOrange">$G_0 = \\{ \\langle ?, ?, ?, ?, ?, ? \\rangle \\}$</div>
+          </div>
+
+          <div class="bg-slate-100 p-3 rounded-lg border border-slate-200">
+            <span class="font-bold text-auNavy block">After $x_1 (+)$ and $x_2 (+)$:</span>
+            <div class="text-emerald-700">$S_2 = \\{ \\langle \\text{Sunny}, \\text{Warm}, ?, \\text{Strong}, \\text{Warm}, \\text{Same} \\rangle \\}$</div>
+            <div class="text-auOrange">$G_2 = \\{ \\langle ?, ?, ?, ?, ?, ? \\rangle \\}$</div>
+          </div>
+
+          <div class="bg-amber-50 p-3 rounded-lg border border-amber-200">
+            <span class="font-bold text-rose-800 block">After $x_3 (-)$ (Rainy, Cold, High, Strong, Warm, Change):</span>
+            <div class="text-emerald-700">$S_3 = \\{ \\langle \\text{Sunny}, \\text{Warm}, ?, \\text{Strong}, \\text{Warm}, \\text{Same} \\rangle \\}$</div>
+            <div class="text-auOrange">$G_3 = \\{ \\langle \\text{Sunny}, ?, ?, ?, ?, ? \\rangle, \\langle ?, \\text{Warm}, ?, ?, ?, ? \\rangle, \\langle ?, ?, ?, ?, ?, \\text{Same} \\rangle \\}$</div>
+          </div>
+
+          <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+            <span class="font-bold text-emerald-800 block">After $x_4 (+)$ (Sunny, Warm, High, Strong, Cool, Change):</span>
+            <div class="text-emerald-700">$S_4 = \\{ \\langle \\text{Sunny}, \\text{Warm}, ?, \\text{Strong}, ?, ? \\rangle \\}$</div>
+            <div class="text-auOrange">$G_4 = \\{ \\langle \\text{Sunny}, ?, ?, ?, ?, ? \\rangle, \\langle ?, \\text{Warm}, ?, ?, ?, ? \\rangle \\}$</div>
+          </div>
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed italic">
+        "At step 3, $G$ specializes into 3 candidates. At step 4, $S$ generalizes and prunes $G$."
+      </p>
+    `
+  },
+
+  // SLIDE 17: Inductive Bias
+  {
+    title: "Inductive Bias & Generalization",
+    kicker: "MODULE 17 • Generalization Theory",
+    content: `
+      <div class="space-y-6">
+        <p class="text-base text-slate-700 leading-relaxed">
+          How can a concept learning algorithm classify unseen instances outside $D$? It relies on its <strong>Inductive Bias</strong>.
+        </p>
+
+        <div class="bg-auNavy text-white p-5 rounded-xl space-y-3 shadow-md">
+          <span class="text-xs font-mono font-bold text-auOrange uppercase block">Formal Definition: Inductive Bias</span>
+          <p class="text-sm font-medium leading-relaxed">
+            Consider a concept learning algorithm $L$ for instance space $X$, target concept $c$, and training data $D = \\{\\langle x, c(x) \\rangle\\}$.
+          </p>
+          <p class="text-xs text-slate-300">
+            The <strong>Inductive Bias</strong> of $L$ is the minimal set of assertions $B$ such that for all $x_i \\in X$:
+          </p>
+          <div class="font-mono text-xs text-emerald-400 font-bold bg-auNavyLight p-3 rounded border border-white/20">
+            $$\\forall x_i \\in X \\quad \\big[ B \\land D \\land x_i \\big] \\vdash L(x_i, D)$$
+          </div>
+        </div>
+
+        <div class="bg-slate-50 border-l-4 border-auOrange p-4 rounded-r-xl border border-slate-200 text-xs text-slate-700">
+          <strong>Inductive Bias of Candidate-Elimination:</strong> <br/>
+          <em>"The target concept $c$ is representable as a conjunction of attribute constraints in $H$."</em>
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed">
+        "Inductive bias is what enables a machine learning model to make predictions beyond memorized training examples."
+      </p>
+    `
+  },
+
+  // SLIDE 18: Futility of Unbiased Learning
+  {
+    title: "Unbiased Learners & The Power Set ($2^X$)",
+    kicker: "MODULE 18 • The Futility Theorem",
+    content: `
+      <div class="space-y-6">
+        <p class="text-base text-slate-700 leading-relaxed">
+          Can we eliminate bias altogether by allowing $H$ to express <em>every possible concept</em> (the power set $2^X$)?
+        </p>
+
+        <div class="bg-slate-50 border-l-4 border-rose-500 p-5 rounded-r-xl border border-slate-200 space-y-3">
+          <span class="text-xs font-mono font-bold text-rose-700 uppercase block">The Unbiased Learner Dilemma</span>
+          <p class="text-sm text-slate-700 leading-relaxed">
+            If $H = 2^X$, the size of the hypothesis space becomes $|H| = 2^{|X|} = 2^{96} \\approx 7.9 \\times 10^{28}$ hypotheses!
+          </p>
+          <div class="p-3 bg-white rounded border border-slate-200 text-xs font-bold text-rose-800">
+            Futility Result: An unbiased learner can NEVER generalize to a single unseen instance $x \\notin D$!
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-2 text-xs">
+          <span class="font-bold text-auNavy uppercase block">Proof Intuition:</span>
+          <p class="text-slate-600 leading-relaxed">
+            For any unseen instance $x \\notin D$, exactly HALF of the consistent hypotheses in $2^X$ will classify $x$ as positive ($1$), and exactly HALF will classify $x$ as negative ($0$).
+          </p>
+          <p class="text-slate-700 font-semibold pt-1">
+            Result: A majority vote among consistent hypotheses in $2^X$ yields an exact 50/50 tie for every unseen instance!
+          </p>
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed">
+        "An unbiased learner cannot learn! Bias is fundamentally necessary."
+      </p>
+    `
+  },
+
+  // SLIDE 19: Chapter Summary & Quiz
+  {
+    title: "Chapter Summary & Assessment",
+    kicker: "MODULE 19 • Review & Mastery Quiz",
+    content: `
+      <div class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1">
+            <span class="font-bold text-auNavy block">1. Concept Search</span>
+            <p class="text-slate-600">Concept learning is a search through $H$ driven by general-to-specific partial ordering $\\ge_g$.</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1">
+            <span class="font-bold text-auOrange block">2. Version Spaces</span>
+            <p class="text-slate-600">Represented compactly by specific boundary $S$ and general boundary $G$.</p>
+          </div>
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1">
+            <span class="font-bold text-auNavy block">3. Inductive Bias</span>
+            <p class="text-slate-600">Fundamental necessity for machine learning generalization beyond memorization.</p>
+          </div>
+        </div>
+
+        <!-- Interactive Quiz Container -->
+        <div id="quizBox" class="bg-slate-50 p-6 rounded-xl border border-slate-200 space-y-4">
+          <div class="flex justify-between items-center border-b pb-3 border-slate-200">
+            <h3 class="font-bold text-sm text-auNavy uppercase tracking-wide flex items-center gap-2">
+              <i class="fa-solid fa-graduation-cap text-auOrange"></i> Chapter Mastery Quiz
+            </h3>
+            <span id="quizScore" class="text-xs font-bold text-auOrange font-mono">Score: 0 / 2</span>
+          </div>
+
+          <!-- Q1 -->
+          <div class="space-y-2 text-xs">
+            <p class="font-bold text-slate-800">Q1: What happens to General Boundary $G$ when a negative training instance $x (-)$ is processed in Candidate-Elimination?</p>
+            <div class="space-y-1 font-sans">
+              <button onclick="checkQuiz(1, 'A')" class="w-full text-left p-2.5 bg-white border rounded-lg hover:border-auOrange text-slate-700 transition">A. It is generalized to include the negative instance.</button>
+              <button onclick="checkQuiz(1, 'B')" class="w-full text-left p-2.5 bg-white border rounded-lg hover:border-auOrange text-slate-700 transition">B. It is specialized downward to exclude $x$ while staying more general than $S$.</button>
+              <button onclick="checkQuiz(1, 'C')" class="w-full text-left p-2.5 bg-white border rounded-lg hover:border-auOrange text-slate-700 transition">C. It remains completely unchanged.</button>
+            </div>
+            <div id="quizFeedback1" class="hidden text-xs p-2 rounded font-bold"></div>
+          </div>
+
+          <!-- Q2 -->
+          <div class="space-y-2 text-xs pt-2">
+            <p class="font-bold text-slate-800">Q2: Why can't an unbiased learner ($H = 2^X$) generalize to unseen instances?</p>
+            <div class="space-y-1 font-sans">
+              <button onclick="checkQuiz(2, 'A')" class="w-full text-left p-2.5 bg-white border rounded-lg hover:border-auOrange text-slate-700 transition">A. Because consistent hypotheses always split 50/50 for any unseen instance.</button>
+              <button onclick="checkQuiz(2, 'B')" class="w-full text-left p-2.5 bg-white border rounded-lg hover:border-auOrange text-slate-700 transition">B. Because $2^X$ cannot fit the training data $D$.</button>
+              <button onclick="checkQuiz(2, 'C')" class="w-full text-left p-2.5 bg-white border rounded-lg hover:border-auOrange text-slate-700 transition">C. Because FIND-S cannot execute on $2^X$.</button>
+            </div>
+            <div id="quizFeedback2" class="hidden text-xs p-2 rounded font-bold"></div>
+          </div>
+
+        </div>
+      </div>
+    `,
+    notes: `
+      <span class="bg-auOrange text-white font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded">PRESENTER SCRIPT</span>
+      <p class="mt-2 text-xs text-slate-700 leading-relaxed italic">
+        "That concludes Chapter 2! Take a moment to answer these two quick assessment questions to test your understanding before our next session."
+      </p>
+    `
+  }
+];
+
+let currentSlide = 0;
+let isNotesOpen = true;
+let isReadingMode = false;
+let quizAnswers = { 1: false, 2: false };
+
+// ZOOM AND PAN STATE
+let zoomScale = 1.0;
+let panX = 0;
+let panY = 0;
+let isDragging = false;
+let startX = 0;
+let startY = 0;
+
+// CE Dataset state
+let ceDataset = [
+  { sky: 'Sunny', temp: 'Warm', hum: 'Normal', wind: 'Strong', water: 'Warm', forecast: 'Same', label: 'Yes' },
+  { sky: 'Sunny', temp: 'Warm', hum: 'High', wind: 'Strong', water: 'Warm', forecast: 'Same', label: 'Yes' },
+  { sky: 'Rainy', temp: 'Cold', hum: 'High', wind: 'Strong', water: 'Warm', forecast: 'Change', label: 'No' },
+  { sky: 'Sunny', temp: 'Warm', hum: 'High', wind: 'Strong', water: 'Cool', forecast: 'Change', label: 'Yes' }
+];
+
+let findSStep = 0;
+
+function updateDateTime() {
+  const now = new Date();
+  const options = { 
+    year: 'numeric', 
+    month: 'short', 
+    day: '2-digit', 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    second: '2-digit',
+    hour12: true 
+  };
+  const formatted = now.toLocaleString('en-US', options);
+  const elem = document.getElementById('footerDateTime');
+  if (elem) {
+    elem.textContent = formatted;
+  }
+}
+
+// ZOOM AND PAN ENGINE IMPLEMENTATION
+function updateTransform() {
+  const viewport = document.getElementById('zoomViewport');
+  const display = document.getElementById('zoomLevelDisplay');
+  if (viewport) {
+    viewport.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomScale})`;
+  }
+  if (display) {
+    display.textContent = `${Math.round(zoomScale * 100)}%`;
+  }
+}
+
+function zoomIn() {
+  zoomScale = Math.min(zoomScale + 0.15, 3.0);
+  updateTransform();
+}
+
+function zoomOut() {
+  zoomScale = Math.max(zoomScale - 0.15, 0.5);
+  updateTransform();
+}
+
+function resetZoom() {
+  zoomScale = 1.0;
+  panX = 0;
+  panY = 0;
+  updateTransform();
+}
+
+function initZoomAndPan() {
+  const stage = document.getElementById('stageArea');
+  const viewport = document.getElementById('zoomViewport');
+
+  if (!stage || !viewport) return;
+
+  // Mouse Wheel Zooming
+  stage.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const zoomFactor = 0.08;
+    if (e.deltaY < 0) {
+      zoomScale = Math.min(zoomScale + zoomFactor, 3.0);
+    } else {
+      zoomScale = Math.max(zoomScale - zoomFactor, 0.5);
+    }
+    updateTransform();
+  }, { passive: false });
+
+  // Pan Mouse Down
+  stage.addEventListener('mousedown', (e) => {
+    // Only trigger pan if left click and not interacting with form inputs/buttons
+    if (e.button !== 0 || e.target.closest('button, select, input, a')) return;
+    isDragging = true;
+    startX = e.clientX - panX;
+    startY = e.clientY - panY;
+    viewport.classList.add('panning');
+  });
+
+  // Pan Mouse Move
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    panX = e.clientX - startX;
+    panY = e.clientY - startY;
+    updateTransform();
+  });
+
+  // Pan Mouse Up
+  window.addEventListener('mouseup', () => {
+    if (isDragging) {
+      isDragging = false;
+      viewport.classList.remove('panning');
+    }
+  });
+}
+
+function renderSlide(index) {
+  if (index < 0) index = 0;
+  if (index >= slidesData.length) index = slidesData.length - 1;
+  currentSlide = index;
+
+  const data = slidesData[index];
+  const container = document.getElementById('slideContent');
+
+  container.innerHTML = `
+    <div class="slide-container space-y-4">
+      <div class="border-b border-slate-200 pb-3">
+        <span class="text-xs font-mono font-bold text-auOrange tracking-widest uppercase">${data.kicker}</span>
+        <h2 class="text-2xl font-bold text-auNavy mt-0.5">${data.title}</h2>
+      </div>
+      <div>
+        ${data.content}
+      </div>
+    </div>
+  `;
+
+  // Reset zoom & pan when switching slides for better usability
+  resetZoom();
+
+  // Update Notes
+  document.getElementById('notesContent').innerHTML = data.notes;
+
+  // Update Controls & Dropdown
+  document.getElementById('slideJumpSelect').value = index;
+  document.getElementById('prevBtn').disabled = (index === 0);
+  document.getElementById('nextBtn').disabled = (index === slidesData.length - 1);
+
+  // Update Progress Bar
+  const pct = ((index + 1) / slidesData.length) * 100;
+  document.getElementById('progressBar').style.width = `${pct}%`;
+
+  // Update Footer Info
+  document.getElementById('footerPageNum').textContent = `Page ${index + 1} / ${slidesData.length}`;
+  document.getElementById('footerTopic').textContent = `Topic: ${data.title}`;
+
+  // Re-trigger MathJax rendering
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise();
+  }
+}
+
+function nextSlide() {
+  if (currentSlide < slidesData.length - 1) {
+    renderSlide(currentSlide + 1);
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    renderSlide(currentSlide - 1);
+  }
+}
+
+function jumpToSlide(idx) {
+  renderSlide(idx);
+}
+
+function toggleNotesPanel() {
+  const panel = document.getElementById('notesPanel');
+  isNotesOpen = !isNotesOpen;
+  if (isNotesOpen) {
+    panel.classList.remove('hidden');
+  } else {
+    panel.classList.add('hidden');
+  }
+}
+
+function toggleReadingMode() {
+  isReadingMode = !isReadingMode;
+  const stage = document.getElementById('stageArea');
+  const btn = document.getElementById('readingModeBtn');
+  if (isReadingMode) {
+    stage.classList.add('max-w-4xl', 'mx-auto');
+    btn.classList.add('bg-auOrange');
+  } else {
+    stage.classList.remove('max-w-4xl', 'mx-auto');
+    btn.classList.remove('bg-auOrange');
+  }
+}
+
+function checkQuiz(qNum, option) {
+  const fb = document.getElementById(`quizFeedback${qNum}`);
+  fb.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+
+  if (qNum === 1) {
+    if (option === 'B') {
+      fb.classList.add('bg-emerald-100', 'text-emerald-800');
+      fb.innerHTML = '<i class="fa-solid fa-circle-check"></i> Correct! Negative instances force G to specialize downward to exclude x while staying above S.';
+      quizAnswers[1] = true;
+    } else {
+      fb.classList.add('bg-rose-100', 'text-rose-800');
+      fb.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Incorrect. Recall that negative examples specialize G downward.';
+      quizAnswers[1] = false;
+    }
+  } else if (qNum === 2) {
+    if (option === 'A') {
+      fb.classList.add('bg-emerald-100', 'text-emerald-800');
+      fb.innerHTML = '<i class="fa-solid fa-circle-check"></i> Correct! In 2^X, remaining consistent hypotheses result in an exact 50/50 vote split on unseen instances.';
+      quizAnswers[2] = true;
+    } else {
+      fb.classList.add('bg-rose-100', 'text-rose-800');
+      fb.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Incorrect. Review the unbiased learner proof intuition in Slide 18.';
+      quizAnswers[2] = false;
+    }
+  }
+
+  const score = (quizAnswers[1] ? 1 : 0) + (quizAnswers[2] ? 1 : 0);
+  document.getElementById('quizScore').textContent = `Score: ${score} / 2`;
+}
+
+function openPlayground(tab) {
+  document.getElementById('labModal').classList.remove('hidden');
+  switchLabTab(tab || 'ce');
+  renderCEData();
+  evaluateMatch();
+}
+
+function closePlayground() {
+  document.getElementById('labModal').classList.add('hidden');
+}
+
+function switchLabTab(tab) {
+  document.getElementById('labTabCE').classList.add('hidden');
+  document.getElementById('labTabFindS').classList.add('hidden');
+  document.getElementById('labTabTester').classList.add('hidden');
+
+  document.getElementById('tabBtnCE').className = "px-3 py-1 rounded-md text-slate-300 hover:text-white";
+  document.getElementById('tabBtnFindS').className = "px-3 py-1 rounded-md text-slate-300 hover:text-white";
+  document.getElementById('tabBtnTester').className = "px-3 py-1 rounded-md text-slate-300 hover:text-white";
+
+  if (tab === 'ce') {
+    document.getElementById('labTabCE').classList.remove('hidden');
+    document.getElementById('tabBtnCE').className = "px-3 py-1 rounded-md text-white bg-auOrange";
+  } else if (tab === 'finds') {
+    document.getElementById('labTabFindS').classList.remove('hidden');
+    document.getElementById('tabBtnFindS').className = "px-3 py-1 rounded-md text-white bg-auOrange";
+    stepFindS(0);
+  } else {
+    document.getElementById('labTabTester').classList.remove('hidden');
+    document.getElementById('tabBtnTester').className = "px-3 py-1 rounded-md text-white bg-auOrange";
+  }
+}
+
+function renderCEData() {
+  const listElem = document.getElementById('ceInstancesList');
+  listElem.innerHTML = ceDataset.map((inst, idx) => `
+    <div class="flex items-center justify-between bg-slate-50 p-2 rounded border border-slate-200 text-xs font-mono">
+      <span>x${idx+1}: $\\langle${inst.sky}, ${inst.temp}, ${inst.hum}, ${inst.wind}, ${inst.water}, ${inst.forecast}\\rangle$</span>
+      <span class="${inst.label === 'Yes' ? 'text-emerald-700 font-bold' : 'text-rose-700 font-bold'}">${inst.label === 'Yes' ? '(+)' : '(-)'}</span>
+    </div>
+  `).join('');
+
+  // Compute S and G
+  let S = ['Ø', 'Ø', 'Ø', 'Ø', 'Ø', 'Ø'];
+  let G = [['?', '?', '?', '?', '?', '?']];
+
+  ceDataset.forEach(inst => {
+    const vals = [inst.sky, inst.temp, inst.hum, inst.wind, inst.water, inst.forecast];
+    if (inst.label === 'Yes') {
+      // Generalize S
+      for (let i = 0; i < 6; i++) {
+        if (S[i] === 'Ø') S[i] = vals[i];
+        else if (S[i] !== vals[i]) S[i] = '?';
+      }
+    }
+  });
+
+  // Simplified G boundary display logic for standard EnjoySport dataset
+  if (ceDataset.length >= 4) {
+    G = [
+      ['Sunny', '?', '?', '?', '?', '?'],
+      ['?', 'Warm', '?', '?', '?', '?']
+    ];
+  } else if (ceDataset.length >= 3) {
+    G = [
+      ['Sunny', '?', '?', '?', '?', '?'],
+      ['?', 'Warm', '?', '?', '?', '?'],
+      ['?', '?', '?', '?', '?', 'Same']
+    ];
+  }
+
+  document.getElementById('boundarySDisplay').innerHTML = `
+    <span class="bg-auNavy text-white px-3 py-1 rounded font-bold font-mono">
+      S = $\\langle ${S.join(', ')} \\rangle$
+    </span>
+  `;
+
+  document.getElementById('boundaryGDisplay').innerHTML = G.map(g => `
+    <span class="bg-auOrange/10 border border-auOrange text-auOrange px-2.5 py-1 rounded font-bold font-mono">
+      $\\langle ${g.join(', ')} \\rangle$
+    </span>
+  `).join(' ');
+
+  document.getElementById('vsCountText').textContent = `Active Boundaries: |S|=${1}, |G|=${G.length}`;
+
+  // Render Visual Lattice
+  document.getElementById('vsLatticeVisual').innerHTML = `
+    <div class="text-xs text-auOrange font-mono font-bold">G = { ${G.map(g => `⟨${g.join(',')}⟩`).join(' , ')} }</div>
+    <div class="my-2 text-slate-500"><i class="fa-solid fa-arrows-up-down"></i> Version Space Boundaries <i class="fa-solid fa-arrows-up-down"></i></div>
+    <div class="text-xs text-emerald-300 font-mono font-bold">S = { ⟨${S.join(',')}⟩ }</div>
+  `;
+
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise();
+  }
+}
+
+function addCEInstance() {
+  const inst = {
+    sky: document.getElementById('addSky').value,
+    temp: document.getElementById('addTemp').value,
+    hum: document.getElementById('addHum').value,
+    wind: document.getElementById('addWind').value,
+    water: document.getElementById('addWater').value,
+    forecast: document.getElementById('addForecast').value,
+    label: document.getElementById('addTarget').value === 'Yes' ? 'Yes' : 'No'
+  };
+  ceDataset.push(inst);
+  renderCEData();
+}
+
+function resetCEDataset() {
+  ceDataset = [
+    { sky: 'Sunny', temp: 'Warm', hum: 'Normal', wind: 'Strong', water: 'Warm', forecast: 'Same', label: 'Yes' },
+    { sky: 'Sunny', temp: 'Warm', hum: 'High', wind: 'Strong', water: 'Warm', forecast: 'Same', label: 'Yes' },
+    { sky: 'Rainy', temp: 'Cold', hum: 'High', wind: 'Strong', water: 'Warm', forecast: 'Change', label: 'No' },
+    { sky: 'Sunny', temp: 'Warm', hum: 'High', wind: 'Strong', water: 'Cool', forecast: 'Change', label: 'Yes' }
+  ];
+  renderCEData();
+}
+
+function stepFindS(step) {
+  if (step < 0) step = 0;
+  if (step > 4) step = 4;
+  findSStep = step;
+
+  document.getElementById('findSStepLabel').textContent = `Step ${step} / 4`;
+
+  const traceData = [
+    { inst: "Init", label: "-", action: "Initialize to most specific hypothesis", h: "⟨Ø, Ø, Ø, Ø, Ø, Ø⟩" },
+    { inst: "⟨Sunny, Warm, Normal, Strong, Warm, Same⟩", label: "+", action: "First positive example: set h = x1", h: "⟨Sunny, Warm, Normal, Strong, Warm, Same⟩" },
+    { inst: "⟨Sunny, Warm, High, Strong, Warm, Same⟩", label: "+", action: "Humidity differs: set position 3 to ?", h: "⟨Sunny, Warm, ?, Strong, Warm, Same⟩" },
+    { inst: "⟨Rainy, Cold, High, Strong, Warm, Change⟩", label: "-", action: "Negative example: ignored completely", h: "⟨Sunny, Warm, ?, Strong, Warm, Same⟩" },
+    { inst: "⟨Sunny, Warm, High, Strong, Cool, Change⟩", label: "+", action: "Water & Forecast differ: set to ?", h: "⟨Sunny, Warm, ?, Strong, ?, ?⟩" }
+  ];
+
+  const cur = traceData[step];
+  document.getElementById('findSCurrentInst').innerHTML = cur.inst;
+  document.getElementById('findSActionNote').textContent = cur.action;
+  document.getElementById('findSHypothesis').innerHTML = `$${cur.h}$`;
+
+  const tbody = document.getElementById('findSTraceBody');
+  tbody.innerHTML = traceData.slice(0, step + 1).map((row, idx) => `
+    <tr class="${row.label === '+' ? 'bg-emerald-50' : row.label === '-' ? 'bg-rose-50' : ''}">
+      <td class="p-2 font-bold">${idx}</td>
+      <td class="p-2 font-mono">${row.inst}</td>
+      <td class="p-2 font-bold">${row.label}</td>
+      <td class="p-2 font-sans">${row.action}</td>
+      <td class="p-2 font-mono font-bold text-auNavy">${row.h}</td>
+    </tr>
+  `).join('');
+
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise();
+  }
+}
+
+function evaluateMatch() {
+  const hSky = document.getElementById('testHSky').value;
+  const hTemp = document.getElementById('testHTemp').value;
+  const hHum = document.getElementById('testHHum').value;
+  const hWind = document.getElementById('testHWind').value;
+
+  const xSky = document.getElementById('testXSky').value;
+  const xTemp = document.getElementById('testXTemp').value;
+  const xHum = document.getElementById('testXHum').value;
+  const xWind = document.getElementById('testXWind').value;
+
+  document.getElementById('testHDisplay').innerHTML = `$h = \\langle ${hSky}, ${hTemp}, ${hHum}, ${hWind} \\rangle$`;
+  document.getElementById('testXDisplay').innerHTML = `$x = \\langle ${xSky}, ${xTemp}, ${xHum}, ${xWind} \\rangle$`;
+
+  const matchSky = (hSky === '?' || hSky === xSky);
+  const matchTemp = (hTemp === '?' || hTemp === xTemp);
+  const matchHum = (hHum === '?' || hHum === xHum);
+  const matchWind = (hWind === '?' || hWind === xWind);
+
+  const isMatch = matchSky && matchTemp && matchHum && matchWind;
+  const resBox = document.getElementById('matchResultBox');
+
+  if (isMatch) {
+    resBox.className = "p-4 rounded-xl border bg-emerald-100 border-emerald-300 text-emerald-800 text-center font-bold text-sm";
+    resBox.innerHTML = '<i class="fa-solid fa-circle-check text-lg"></i> Match Success: Instance x satisfies hypothesis h! [ h(x) = 1 ]';
+  } else {
+    resBox.className = "p-4 rounded-xl border bg-rose-100 border-rose-300 text-rose-800 text-center font-bold text-sm";
+    resBox.innerHTML = '<i class="fa-solid fa-circle-xmark text-lg"></i> Match Failure: Instance x does NOT satisfy hypothesis h. [ h(x) = 0 ]';
+  }
+
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise();
+  }
+}
+
+window.onload = function() {
+  renderSlide(0);
+  initZoomAndPan();
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+};
+</script>
+</body>
+</html>
